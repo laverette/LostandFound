@@ -165,7 +165,45 @@
     <button id="add-found-btn" class="floating-btn" onclick="openModal()">
         <i class="fas fa-plus"></i>
     </button>
+<!-- Claim Item -->
+ <section id="claim-section" style="display:none;">
+            <div class="report-header">
+                <h2><span class="icon">🎫</span> Claim Process</h2>
+            </div>
+            <form id="claimForm" class="report-form">
+                <label for="claimItem">Item Name *</label>
+                <input type="text" id="claimItem" name="claimItem" required>
 
+                <div class="form-row">
+                        <div class="form-group">
+                            <label for="last-seen-building">Last Seen Building *</label>
+                            <select id="last-seen-building" name="lastSeenBuilding" required>
+                                <option value="">Select Building</option>
+                                <option value="Bruno">Bruno</option>
+                                <option value="Hewson">Hewson</option>
+                                <option value="Bidgood">Bidgood</option>
+                                <option value="Alston">Alston</option>
+                                <option value="North Lawn">North Lawn</option>
+                                <option value="Student Center">Student Center</option>
+                            </select>
+                        </div>
+
+                <label for="claimRoom">Room Number</label>
+                <input type="text" id="claimRoom" name="claimRoom" placeholder="e.g., 201, Lab A">
+
+                <label for="claimerName">Your Name *</label>
+                <input type="text" id="claimerName" name="claimerName" required>
+
+                <label for="claimerEmail">Email *</label>
+                <input type="email" id="claimerEmail" name="claimerEmail" required>
+
+                <label for="claimDate">Date of Claim</label>
+                <input type="date" id="claimDate" name="claimDate" value="09/18/2025">
+
+                <button type="submit" class="submit-btn"><span class="icon">🎫</span> Submit Claim</button>
+            </form>
+        </section>
     <script src="resources/scripts/app.js"></script>
 </body>
 </html>
+
