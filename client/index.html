@@ -3,17 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>University of Alabama Lost & Found</title>
+    <title>Alabama Lost & Found</title>
     <link rel="stylesheet" href="resources/styles/index.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
     <header class="header">
         <div class="container">
-            <h1><i class="fas fa-search"></i> University of Alabama Lost & Found</h1>
+            <h1><i class="fas fa-search"></i>Crimson Lost & Found</h1>
+            <p class="header-subtitle">Helping Crimson Tide students find their lost items</p>
             <nav class="nav">
                 <button class="nav-btn active" data-section="found">Found Items</button>
                 <button class="nav-btn" data-section="missing">Report Missing</button>
+                <button class="nav-btn" data-section="claim">Claims</button>
             </nav>
         </div>
     </header>
@@ -28,7 +30,6 @@
                         <select id="building-filter" class="filter-select">
                             <option value="">All Buildings</option>
                             <option value="Bruno">Bruno</option>
-                            <option value="Hewson">Hewson</option>
                             <option value="Bidgood">Bidgood</option>
                             <option value="Hewson">Hewson</option>
                             <option value="Alston">Alston</option>
@@ -52,6 +53,7 @@
             <section id="missing-section" class="section">
                 <div class="section-header">
                     <h2><i class="fas fa-exclamation-triangle"></i> Report Missing Item</h2>
+                    <p class="section-subtitle">Lost something? Let your fellow Crimson Tide students help you find it!</p>
                 </div>
                 
                 <form id="missing-item-form" class="missing-form">
@@ -75,7 +77,6 @@
                                 <option value="Bidgood">Bidgood</option>
                                 <option value="Alston">Alston</option>
                                 <option value="North Lawn">North Lawn</option>
-                                <option value="Student Center">Student Center</option>
                             </select>
                         </div>
                         
@@ -104,6 +105,60 @@
                     
                     <button type="submit" class="submit-btn">
                         <i class="fas fa-paper-plane"></i> Submit Report
+                    </button>
+                </form>
+            </section>
+
+            <!-- Claims Section -->
+            <section id="claim-section" class="section">
+                <div class="section-header">
+                    <h2><i class="fas fa-ticket-alt"></i> Claim Process</h2>
+                    <p class="section-subtitle">Think you found your lost item? Submit a claim to get it back!</p>
+                </div>
+                <form id="claim-form" class="missing-form">
+                    <div class="form-group">
+                        <label for="claim-item">Item Name *</label>
+                        <input type="text" id="claim-item" name="claimItem" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="claim-building">Last Seen Building *</label>
+                            <select id="claim-building" name="claimBuilding" required>
+                                <option value="">Select Building</option>
+                                <option value="Bruno">Bruno</option>
+                                <option value="Hewson">Hewson</option>
+                                <option value="Bidgood">Bidgood</option>
+                                <option value="Alston">Alston</option>
+                                <option value="North Lawn">North Lawn</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="claim-room">Room Number</label>
+                            <input type="text" id="claim-room" name="claimRoom" placeholder="e.g., 201, Lab A">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="claimer-name">Your Name *</label>
+                            <input type="text" id="claimer-name" name="claimerName" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="claimer-email">Email *</label>
+                            <input type="email" id="claimer-email" name="claimerEmail" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="claim-date">Date of Claim</label>
+                        <input type="date" id="claim-date" name="claimDate">
+                    </div>
+
+                    <button type="submit" class="submit-btn">
+                        <i class="fas fa-ticket-alt"></i> Submit Claim
                     </button>
                 </form>
             </section>
@@ -138,7 +193,6 @@
                             <option value="Bidgood">Bidgood</option>
                             <option value="Alston">Alston</option>
                             <option value="North Lawn">North Lawn</option>
-                            <option value="Student Center">Student Center</option>
                         </select>
                     </div>
                     
@@ -161,48 +215,69 @@
         </div>
     </div>
 
+    <!-- Claim Item Modal -->
+    <div id="claim-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-ticket-alt"></i> Claim Item</h3>
+                <button class="close-btn" onclick="closeClaimModal()">&times;</button>
+            </div>
+            <form id="claim-item-form" class="found-form">
+                <input type="hidden" id="claim-item-id" name="itemId">
+                
+                <div class="form-group">
+                    <label>Item Details</label>
+                    <div class="item-preview" id="claim-item-preview">
+                        <!-- Item details will be populated here -->
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="claim-item-name">Item Name *</label>
+                    <input type="text" id="claim-item-name" name="itemName" required readonly>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="claim-item-building">Building *</label>
+                        <input type="text" id="claim-item-building" name="building" required readonly>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="claim-item-room">Room</label>
+                        <input type="text" id="claim-item-room" name="room" readonly>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="claim-claimer-name">Your Name *</label>
+                        <input type="text" id="claim-claimer-name" name="claimerName" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="claim-claimer-email">Email *</label>
+                        <input type="email" id="claim-claimer-email" name="claimerEmail" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="claim-claim-date">Date of Claim</label>
+                    <input type="date" id="claim-claim-date" name="claimDate">
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" onclick="closeClaimModal()">Cancel</button>
+                    <button type="submit" class="btn-primary">Submit Claim</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Floating Add Button -->
     <button id="add-found-btn" class="floating-btn" onclick="openModal()">
         <i class="fas fa-plus"></i>
     </button>
-<!-- Claim Item -->
- <section id="claim-section" style="display:none;">
-            <div class="report-header">
-                <h2><span class="icon">🎫</span> Claim Process</h2>
-            </div>
-            <form id="claimForm" class="report-form">
-                <label for="claimItem">Item Name *</label>
-                <input type="text" id="claimItem" name="claimItem" required>
-
-                <div class="form-row">
-                        <div class="form-group">
-                            <label for="last-seen-building">Last Seen Building *</label>
-                            <select id="last-seen-building" name="lastSeenBuilding" required>
-                                <option value="">Select Building</option>
-                                <option value="Bruno">Bruno</option>
-                                <option value="Hewson">Hewson</option>
-                                <option value="Bidgood">Bidgood</option>
-                                <option value="Alston">Alston</option>
-                                <option value="North Lawn">North Lawn</option>
-                                <option value="Student Center">Student Center</option>
-                            </select>
-                        </div>
-
-                <label for="claimRoom">Room Number</label>
-                <input type="text" id="claimRoom" name="claimRoom" placeholder="e.g., 201, Lab A">
-
-                <label for="claimerName">Your Name *</label>
-                <input type="text" id="claimerName" name="claimerName" required>
-
-                <label for="claimerEmail">Email *</label>
-                <input type="email" id="claimerEmail" name="claimerEmail" required>
-
-                <label for="claimDate">Date of Claim</label>
-                <input type="date" id="claimDate" name="claimDate" value="09/18/2025">
-
-                <button type="submit" class="submit-btn"><span class="icon">🎫</span> Submit Claim</button>
-            </form>
-        </section>
     <script src="resources/scripts/app.js"></script>
 </body>
 </html>

@@ -3,6 +3,7 @@ class LostAndFoundApp {
     constructor() {
         this.foundItems = this.loadFoundItems();
         this.missingReports = this.loadMissingReports();
+        this.claims = this.loadClaims();
         this.currentFilter = '';
         this.currentSearch = '';
         
@@ -42,6 +43,10 @@ class LostAndFoundApp {
                     const card = e.target.closest('.item-card');
                     const itemId = card.getAttribute('data-id');
                     this.deleteFoundItem(itemId);
+                } else if (e.target.closest('.claim-btn')) {
+                    const card = e.target.closest('.item-card');
+                    const itemId = card.getAttribute('data-id');
+                    this.openClaimModal(itemId);
                 }
             });
 
@@ -61,10 +66,26 @@ class LostAndFoundApp {
             this.handleAddFoundItem(e.target);
         });
 
+        document.getElementById('claim-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.handleClaimSubmit(e.target);
+        });
+
+        document.getElementById('claim-item-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.handleItemClaimSubmit(e.target);
+        });
+
         // Modal
         document.getElementById('add-found-modal').addEventListener('click', (e) => {
             if (e.target.id === 'add-found-modal') {
                 this.closeModal();
+            }
+        });
+
+        document.getElementById('claim-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'claim-modal') {
+                this.closeClaimModal();
             }
         });
     }
@@ -88,6 +109,11 @@ class LostAndFoundApp {
             floatingBtn.style.display = 'block';
         } else {
             floatingBtn.style.display = 'none';
+        }
+
+        // Set current date for claim form when switching to claim section
+        if (sectionName === 'claim') {
+            this.setCurrentDate();
         }
     }
 
@@ -160,6 +186,91 @@ class LostAndFoundApp {
         this.renderFoundItems();
     }
 
+    handleClaimSubmit(form) {
+        const formData = new FormData(form);
+        const claim = {
+            id: Date.now().toString(),
+            itemName: formData.get('claimItem'),
+            building: formData.get('claimBuilding'),
+            room: formData.get('claimRoom'),
+            claimerName: formData.get('claimerName'),
+            claimerEmail: formData.get('claimerEmail'),
+            claimDate: formData.get('claimDate') || new Date().toISOString().split('T')[0],
+            dateSubmitted: new Date().toISOString()
+        };
+
+        this.claims.push(claim);
+        this.saveClaims();
+        
+        this.showSuccessMessage('Claim submitted successfully! We will review your claim and contact you if we find a matching item.');
+        form.reset();
+        this.setCurrentDate();
+    }
+
+    openClaimModal(itemId) {
+        const item = this.foundItems.find(item => item.id === itemId);
+        if (!item) return;
+
+        // Populate the modal with item details
+        document.getElementById('claim-item-id').value = item.id;
+        document.getElementById('claim-item-name').value = item.name;
+        document.getElementById('claim-item-building').value = item.building;
+        document.getElementById('claim-item-room').value = item.room || '';
+        document.getElementById('claim-claim-date').value = new Date().toISOString().split('T')[0];
+
+        // Create item preview
+        const roomText = item.room ? `, Room ${item.room}` : '';
+        const date = new Date(item.dateFound).toLocaleDateString();
+        document.getElementById('claim-item-preview').innerHTML = `
+            <div class="item-preview-card">
+                <h4>${this.escapeHtml(item.name)}</h4>
+                <p><strong>Description:</strong> ${this.escapeHtml(item.description)}</p>
+                <p><strong>Location:</strong> ${this.escapeHtml(item.building)}${roomText}</p>
+                <p><strong>Date Found:</strong> ${date}</p>
+            </div>
+        `;
+
+        // Show the modal
+        document.getElementById('claim-modal').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    closeClaimModal() {
+        document.getElementById('claim-modal').classList.remove('active');
+        document.body.style.overflow = 'auto';
+    }
+
+    handleItemClaimSubmit(form) {
+        const formData = new FormData(form);
+        const itemId = formData.get('itemId');
+        const item = this.foundItems.find(item => item.id === itemId);
+        
+        if (!item) {
+            this.showSuccessMessage('Item not found!', 'error');
+            return;
+        }
+
+        const claim = {
+            id: Date.now().toString(),
+            itemId: itemId,
+            itemName: item.name,
+            itemDescription: item.description,
+            building: item.building,
+            room: item.room,
+            claimerName: formData.get('claimerName'),
+            claimerEmail: formData.get('claimerEmail'),
+            claimDate: formData.get('claimDate') || new Date().toISOString().split('T')[0],
+            dateSubmitted: new Date().toISOString()
+        };
+
+        this.claims.push(claim);
+        this.saveClaims();
+        
+        this.showSuccessMessage(`Claim submitted successfully for "${item.name}"! We will contact you to verify ownership.`);
+        form.reset();
+        this.closeClaimModal();
+    }
+
     showSuccessMessage(message) {
         const existingMessage = document.querySelector('.success-message');
         if (existingMessage) {
@@ -185,6 +296,7 @@ class LostAndFoundApp {
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('date-lost').value = today;
         document.getElementById('found-date').value = today;
+        document.getElementById('claim-date').value = today;
     }
 
     // Local Storage Methods
@@ -194,53 +306,17 @@ class LostAndFoundApp {
             return JSON.parse(stored);
         }
         
-        // Return sample data for demonstration
-        return [
-            {
-                id: '1',
-                name: 'Black iPhone 13',
-                description: 'Black iPhone 13 with a clear case. Screen has a small crack in the top right corner.',
-                building: 'Library',
-                room: 'Study Room 205',
-                dateFound: '2024-01-15'
-            },
-            {
-                id: '2',
-                name: 'Blue Backpack',
-                description: 'Navy blue Jansport backpack with laptop compartment. Contains notebooks and pens.',
-                building: 'Student Center',
-                room: 'Cafeteria',
-                dateFound: '2024-01-14'
-            },
-            {
-                id: '3',
-                name: 'Silver Watch',
-                description: 'Silver analog watch with leather band. Brand appears to be Timex.',
-                building: 'Science Building',
-                room: 'Lab 301',
-                dateFound: '2024-01-13'
-            },
-            {
-                id: '4',
-                name: 'Red Water Bottle',
-                description: 'Red Hydro Flask water bottle with stickers on it. 32oz capacity.',
-                building: 'Gymnasium',
-                room: '',
-                dateFound: '2024-01-12'
-            },
-            {
-                id: '5',
-                name: 'Textbook - Calculus',
-                description: 'Calculus textbook by Stewart. 8th edition. Has highlighting and notes inside.',
-                building: 'Arts Building',
-                room: 'Room 102',
-                dateFound: '2024-01-11'
-            }
-        ];
+        // Return empty array for clean start
+        return [];
     }
 
     loadMissingReports() {
         const stored = localStorage.getItem('universityMissingReports');
+        return stored ? JSON.parse(stored) : [];
+    }
+
+    loadClaims() {
+        const stored = localStorage.getItem('universityClaims');
         return stored ? JSON.parse(stored) : [];
     }
 
@@ -250,6 +326,10 @@ class LostAndFoundApp {
 
     saveMissingReports() {
         localStorage.setItem('universityMissingReports', JSON.stringify(this.missingReports));
+    }
+
+    saveClaims() {
+        localStorage.setItem('universityClaims', JSON.stringify(this.claims));
     }
 
     escapeHtml(text) {
@@ -273,9 +353,14 @@ class LostAndFoundApp {
                     <i class="fas fa-map-marker-alt"></i>
                     <span>${this.escapeHtml(item.building)}${roomText}</span>
                 </div>
-                <button class="delete-btn" title="Delete Item">
-                    <i class="fas fa-trash"></i> Delete
-                </button>
+                <div class="item-actions">
+                    <button class="claim-btn" title="Claim Item" data-item-id="${item.id}">
+                        <i class="fas fa-ticket-alt"></i> Claim
+                    </button>
+                    <button class="delete-btn" title="Delete Item">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                </div>
             </div>          
         `;
     }
@@ -289,6 +374,11 @@ function openModal() {
 
 function closeModal() {
     document.getElementById('add-found-modal').classList.remove('active');
+    document.body.style.overflow = 'auto';
+}
+
+function closeClaimModal() {
+    document.getElementById('claim-modal').classList.remove('active');
     document.body.style.overflow = 'auto';
 }
 
