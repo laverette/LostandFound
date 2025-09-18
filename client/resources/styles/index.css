@@ -9,7 +9,7 @@ body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     line-height: 1.6;
     color: #333;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #9E1B32;
     min-height: 100vh;
 }
 
@@ -43,8 +43,15 @@ body {
 }
 
 .header h1 i {
-    color: #667eea;
+    color: #9E1B32;
     margin-right: 0.5rem;
+}
+
+.header-subtitle {
+    color: #666;
+    font-size: 0.9rem;
+    margin: 0.5rem 0 0 0;
+    font-style: italic;
 }
 
 .nav {
@@ -65,14 +72,14 @@ body {
 }
 
 .nav-btn:hover {
-    background: rgba(102, 126, 234, 0.1);
-    color: #667eea;
+    background: rgba(158, 27, 50, 0.1);
+    color: #9E1B32;
 }
 
 .nav-btn.active {
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: linear-gradient(135deg, #9E1B32, #C8102E);
     color: white;
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 4px 15px rgba(158, 27, 50, 0.3);
 }
 
 /* Main Content */
@@ -113,7 +120,14 @@ body {
 }
 
 .section-header h2 i {
-    color: #667eea;
+    color: #9E1B32;
+}
+
+.section-subtitle {
+    color: #666;
+    font-size: 0.9rem;
+    margin: 0.5rem 0 1rem 0;
+    font-style: italic;
 }
 
 /* Filters */
@@ -134,8 +148,8 @@ body {
 
 .filter-select:focus, .search-input:focus {
     outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    border-color: #9E1B32;
+    box-shadow: 0 0 0 3px rgba(158, 27, 50, 0.1);
 }
 
 .search-input {
@@ -183,7 +197,7 @@ body {
 .item-date {
     font-size: 0.8rem;
     color: #718096;
-    background: rgba(102, 126, 234, 0.1);
+    background: rgba(158, 27, 50, 0.1);
     padding: 0.25rem 0.75rem;
     border-radius: 15px;
 }
@@ -198,7 +212,7 @@ body {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    color: #667eea;
+    color: #9E1B32;
     font-weight: 600;
     font-size: 0.9rem;
 }
@@ -262,8 +276,8 @@ body {
 .form-group select:focus,
 .form-group textarea:focus {
     outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    border-color: #9E1B32;
+    box-shadow: 0 0 0 3px rgba(158, 27, 50, 0.1);
 }
 
 .form-group textarea {
@@ -272,7 +286,7 @@ body {
 }
 
 .submit-btn {
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: linear-gradient(135deg, #9E1B32, #C8102E);
     color: white;
     border: none;
     padding: 1rem 2rem;
@@ -289,7 +303,7 @@ body {
 
 .submit-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 8px 25px rgba(158, 27, 50, 0.3);
 }
 
 /* Modal Styles */
@@ -384,13 +398,13 @@ body {
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: linear-gradient(135deg, #9E1B32, #C8102E);
     color: white;
 }
 
 .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 8px 25px rgba(158, 27, 50, 0.3);
 }
 
 .btn-secondary {
@@ -410,19 +424,19 @@ body {
     width: 60px;
     height: 60px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: linear-gradient(135deg, #9E1B32, #C8102E);
     color: white;
     border: none;
     font-size: 1.5rem;
     cursor: pointer;
-    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 8px 25px rgba(158, 27, 50, 0.3);
     transition: all 0.3s ease;
     z-index: 100;
 }
 
 .floating-btn:hover {
     transform: scale(1.1);
-    box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 12px 35px rgba(158, 27, 50, 0.4);
 }
 
 /* Success Message */
@@ -503,6 +517,32 @@ body {
 }
 
 
+.item-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.claim-btn {
+    background: #38a169;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1;
+}
+
+.claim-btn:hover {
+    background: #2f855a;
+}
+
 .delete-btn {
     background: #e53e3e;
     color: white;
@@ -512,13 +552,34 @@ body {
     font-size: 0.9rem;
     font-weight: 600;
     cursor: pointer;
-    margin-top: 1rem;
     transition: background 0.2s;
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    flex: 1;
 }
+
 .delete-btn:hover {
     background: #c53030;
+}
+
+.item-preview-card {
+    background: #f7fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.item-preview-card h4 {
+    color: #2d3748;
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+}
+
+.item-preview-card p {
+    margin: 0.25rem 0;
+    color: #4a5568;
+    font-size: 0.9rem;
 }
 
