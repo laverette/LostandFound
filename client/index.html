@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alabama Lost & Found</title>
+    <title>UA L&F</title>
     <link rel="stylesheet" href="resources/styles/index.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
@@ -16,6 +16,14 @@
                 <button class="nav-btn active" data-section="found">Found Items</button>
                 <button class="nav-btn" data-section="missing">Report Missing</button>
                 <button class="nav-btn" data-section="claim">Claims</button>
+                <div class="auth-buttons">
+                    <button id="login-btn" class="auth-btn">Login</button>
+                    <button id="register-btn" class="auth-btn">Register</button>
+                    <div id="user-info" class="user-info" style="display: none;">
+                        <span id="user-name"></span>
+                        <button id="logout-btn" class="auth-btn">Logout</button>
+                    </div>
+                </div>
             </nav>
         </div>
     </header>
@@ -269,6 +277,55 @@
                 <div class="modal-actions">
                     <button type="button" class="btn-secondary" onclick="closeClaimModal()">Cancel</button>
                     <button type="submit" class="btn-primary">Submit Claim</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-sign-in-alt"></i> Login</h3>
+                <button class="close-btn" onclick="closeLoginModal()">&times;</button>
+            </div>
+            <form id="login-form" class="auth-form">
+                <div class="form-group">
+                    <label for="login-email">Crimson Email *</label>
+                    <input type="email" id="login-email" name="email" required placeholder="your.name@crimson.ua.edu">
+                    <small class="form-text">Only @crimson.ua.edu email addresses are allowed</small>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" onclick="closeLoginModal()">Cancel</button>
+                    <button type="submit" class="btn-primary">Login</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="register-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-user-plus"></i> Register</h3>
+                <button class="close-btn" onclick="closeRegisterModal()">&times;</button>
+            </div>
+            <form id="register-form" class="auth-form">
+                <div class="form-group">
+                    <label for="register-name">Full Name *</label>
+                    <input type="text" id="register-name" name="name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="register-email">Crimson Email *</label>
+                    <input type="email" id="register-email" name="email" required placeholder="your.name@crimson.ua.edu">
+                    <small class="form-text">Only @crimson.ua.edu email addresses are allowed</small>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" onclick="closeRegisterModal()">Cancel</button>
+                    <button type="submit" class="btn-primary">Register</button>
                 </div>
             </form>
         </div>

@@ -57,6 +57,42 @@ body {
 .nav {
     display: flex;
     gap: 0.5rem;
+    align-items: center;
+}
+
+.auth-buttons {
+    display: flex;
+    gap: 0.5rem;
+    margin-left: 1rem;
+}
+
+.auth-btn {
+    padding: 0.5rem 1rem;
+    border: 2px solid #9E1B32;
+    background: transparent;
+    color: #9E1B32;
+    font-weight: 600;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.auth-btn:hover {
+    background: #9E1B32;
+    color: white;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #4a5568;
+}
+
+.user-info span {
+    font-weight: 600;
+    color: #9E1B32;
 }
 
 .nav-btn {
@@ -375,10 +411,17 @@ body {
     color: #4a5568;
 }
 
-.found-form {
+.found-form, .auth-form {
     padding: 2rem;
     background: transparent;
     box-shadow: none;
+}
+
+.form-text {
+    font-size: 0.8rem;
+    color: #718096;
+    margin-top: 0.25rem;
+    display: block;
 }
 
 .modal-actions {
@@ -450,6 +493,10 @@ body {
     align-items: center;
     gap: 0.5rem;
     animation: slideDown 0.3s ease;
+}
+
+.success-message.error-message {
+    background: linear-gradient(135deg, #e53e3e, #c53030);
 }
 
 @keyframes slideDown {
