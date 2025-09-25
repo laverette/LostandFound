@@ -6,7 +6,11 @@ class LostAndFoundApp {
         this.foundItems = [];
         this.currentFilter = '';
         this.currentSearch = '';
-        
+    this.urgentOnly = false;
+        // API base: prefer localhost:4000 during development, otherwise relative paths
+        this.apiBase = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+            ? `${location.protocol}//${location.hostname}:4000` : '';
+
         this.init();
     }
 
@@ -80,7 +84,9 @@ class LostAndFoundApp {
             this.handleItemClaimSubmit(e.target);
         });
 
-        // Modal close events
+        
+
+        // Modal
         document.getElementById('add-found-modal').addEventListener('click', (e) => {
             if (e.target.id === 'add-found-modal') {
                 this.closeModal();
@@ -411,13 +417,14 @@ class LostAndFoundApp {
         
         let filteredItems = this.foundItems.filter(item => {
             const matchesFilter = !this.currentFilter || item.building === this.currentFilter;
+            const matchesUrgent = !this.urgentOnly || !!item.urgent;
             const matchesSearch = !this.currentSearch || 
                 item.name.toLowerCase().includes(this.currentSearch) ||
                 item.description.toLowerCase().includes(this.currentSearch) ||
                 item.building.toLowerCase().includes(this.currentSearch) ||
                 (item.room && item.room.toLowerCase().includes(this.currentSearch));
             
-            return matchesFilter && matchesSearch;
+            return matchesFilter && matchesUrgent && matchesSearch;
         });
 
         if (filteredItems.length === 0) {
@@ -478,6 +485,14 @@ class LostAndFoundApp {
                 <p><strong>Date Found:</strong> ${date}</p>
             </div>
         `;
+
+    // show claim question if present; if not present on the found item, fall back to a matching missing report's question
+    const missingReport = this.missingReports.find(r => r.id === item.id);
+    const challenge = item.claimQuestion || (missingReport ? missingReport.claimQuestion : '') || '';
+    document.getElementById('claim-question').textContent = challenge ? challenge : 'No claim question set for this item.';
+    // clear the claimant's answer input
+    const claimAnswerEl = document.getElementById('claim-answer');
+    if (claimAnswerEl) claimAnswerEl.value = '';
 
         // Show the modal
         document.getElementById('claim-modal').classList.add('active');
@@ -552,7 +567,7 @@ function closeRegisterModal() {
 
 // Initialize the app when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    new LostAndFoundApp();
+    window.lostAndFoundAppInstance = new LostAndFoundApp();
 });
 
 // Close modal with Escape key
@@ -564,3 +579,4 @@ document.addEventListener('keydown', (e) => {
         closeRegisterModal();
     }
 });
+ 

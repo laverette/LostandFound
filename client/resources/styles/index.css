@@ -201,6 +201,21 @@ body {
     margin-bottom: 2rem;
 }
 
+.urgent-icon {
+    display: inline-block;
+    margin-right: 0.3em;
+    vertical-align: middle;
+    font-size: 1.2em;
+    color: #e02424;
+    filter: drop-shadow(0 0 2px #e02424);
+    animation: urgentPulse 1s infinite alternate;
+}
+
+@keyframes urgentPulse {
+    from { filter: drop-shadow(0 0 2px #e02424); }
+    to { filter: drop-shadow(0 0 8px #e02424); }
+}
+
 .item-card {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);

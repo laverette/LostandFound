@@ -34,7 +34,8 @@
             <section id="found-section" class="section active">
                 <div class="section-header">
                     <h2><i class="fas fa-box"></i> Found Items</h2>
-                    <div class="filters">
+                    <div style="display:flex; align-items:center; gap:1rem;">
+                            <div class="filters">
                         <select id="building-filter" class="filter-select">
                             <option value="">All Buildings</option>
                             <option value="Bruno">Bruno</option>
@@ -44,6 +45,10 @@
                             <option value="North Lawn">North Lawn</option>
                         </select>
                         <input type="text" id="search-items" class="search-input" placeholder="Search items...">
+                        <label style="display:flex; align-items:center; gap:0.5rem; margin-left:8px;">
+                            <input type="checkbox" id="urgent-filter">
+                            <span style="font-size:0.95rem; color:#4a5568;">Show urgent only</span>
+                        </label>
                     </div>
                 </div>
                 
@@ -54,6 +59,18 @@
                 <div id="no-items" class="no-items" style="display: none;">
                     <i class="fas fa-inbox"></i>
                     <p>No items found matching your criteria.</p>
+                </div>
+                <div id="missing-reports-section" class="section" style="margin-top:2rem;">
+                    <div class="section-header">
+                        <h2><i class="fas fa-exclamation-triangle" style="color:#e02424"></i> Reported Missing Items</h2>
+                    </div>
+                    <div id="missing-reports-grid" class="items-grid">
+                        <!-- Missing reports will be dynamically loaded here -->
+                    </div>
+                    <div id="no-missing-reports" class="no-items" style="display: none;">
+                        <i class="fas fa-inbox"></i>
+                        <p>No missing items have been reported.</p>
+                    </div>
                 </div>
             </section>
 
@@ -110,7 +127,18 @@
                         <label for="date-lost">Date Lost</label>
                         <input type="date" id="date-lost" name="dateLost">
                     </div>
-                    
+                    <div class="form-group">
+                        <label for="missing-claim-question">Claim question (optional)</label>
+                        <input type="text" id="missing-claim-question" name="claimQuestion" placeholder="e.g., What color was the keychain?">
+                    </div>
+                    <div class="form-group">
+                        <label for="missing-claim-answer">Expected answer (kept private)</label>
+                        <input type="text" id="missing-claim-answer" name="claimAnswer" placeholder="Private expected answer">
+                    </div>
+                    <div class="form-group">
+                        <input type="checkbox" id="urgent" name="urgent">
+                        <label for="urgent" style="display:inline; margin-left:8px;">Mark as Urgent (e.g., keys, debit card)</label>
+                    </div>
                     <button type="submit" class="submit-btn">
                         <i class="fas fa-paper-plane"></i> Submit Report
                     </button>
@@ -170,6 +198,23 @@
                     </button>
                 </form>
             </section>
+
+            <!-- Archive Section -->
+            <section id="archive-section" class="section">
+                <div class="section-header">
+                    <h2><i class="fas fa-archive"></i> Archive</h2>
+                    <p class="section-subtitle">Missing reports older than one week that were not claimed.</p>
+                </div>
+                <div id="archive-grid" class="items-grid">
+                    <!-- Archive items will be loaded here -->
+                </div>
+                <div id="no-archive" class="no-items" style="display: none;">
+                    <i class="fas fa-archive"></i>
+                    <p>No archived reports yet.</p>
+                </div>
+            </section>
+
+            
         </div>
     </main>
 
@@ -214,6 +259,14 @@
                     <label for="found-date">Date Found</label>
                     <input type="date" id="found-date" name="dateFound">
                 </div>
+                <div class="form-group">
+                    <label for="challenge-question">Claim question (optional)</label>
+                    <input type="text" id="add-claim-question" name="claimQuestion" placeholder="e.g., What color was the keychain?">
+                </div>
+                <div class="form-group">
+                    <label for="challenge-answer">Expected answer (kept private)</label>
+                    <input type="text" id="add-claim-answer" name="claimAnswer" placeholder="Private expected answer">
+                </div>
                 
                 <div class="modal-actions">
                     <button type="button" class="btn-secondary" onclick="closeModal()">Cancel</button>
@@ -222,6 +275,8 @@
             </form>
         </div>
     </div>
+
+
 
     <!-- Claim Item Modal -->
     <div id="claim-modal" class="modal">
@@ -239,6 +294,8 @@
                         <!-- Item details will be populated here -->
                     </div>
                 </div>
+
+                    
                 
                 <div class="form-group">
                     <label for="claim-item-name">Item Name *</label>
@@ -255,6 +312,15 @@
                         <label for="claim-item-room">Room</label>
                         <input type="text" id="claim-item-room" name="room" readonly>
                     </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Claim question</label>
+                    <div id="claim-question" style="color:#2d3748; margin-bottom:0.5rem; font-weight:600;"></div>
+                </div>
+                <div class="form-group">
+                    <label for="claim-answer">Your answer *</label>
+                    <input type="text" id="claim-answer" name="claimAnswer" required>
                 </div>
 
                 <div class="form-row">
@@ -335,6 +401,30 @@
     <button id="add-found-btn" class="floating-btn" onclick="openModal()">
         <i class="fas fa-plus"></i>
     </button>
+    
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-cog"></i> Settings</h3>
+                <button class="close-btn" onclick="closeSettings()">&times;</button>
+            </div>
+            <div style="padding:1.5rem;">
+                <div class="form-group">
+                    <label for="expiry-days">Auto-expire posts after (days)</label>
+                    <input type="number" id="expiry-days" min="1" value="30">
+                </div>
+                <div class="form-group">
+                    <label for="reminder-days">Send reminder X days before expiry</label>
+                    <input type="number" id="reminder-days" min="0" value="3">
+                </div>
+                <div style="display:flex; gap:1rem; justify-content:flex-end; margin-top:1rem;">
+                    <button class="btn-secondary" onclick="closeSettings()">Cancel</button>
+                    <button id="save-settings-btn" class="btn-primary">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <script src="resources/scripts/app.js"></script>
 </body>
 </html>
