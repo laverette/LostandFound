@@ -9,3 +9,4 @@ namespace api.Models
         public DateTime? LastLoginAt { get; set; }
     }
 }
+

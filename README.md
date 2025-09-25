@@ -118,3 +118,4 @@ client/
 - Admin panel for item management
 - Search and filtering improvements
 - Mobile app development
+
