@@ -13,14 +13,25 @@
             <h1><i class="fas fa-search"></i>Crimson Lost & Found</h1>
             <p class="header-subtitle">Helping Crimson Tide students find their lost items</p>
             <nav class="nav">
-                <button class="nav-btn active" data-section="found">Found Items</button>
-                <button class="nav-btn" data-section="missing">Report Missing</button>
-                <button class="nav-btn" data-section="claim">Claims</button>
+                <!-- Student Navigation -->
+                <div id="student-nav" class="nav-group">
+                    <button class="nav-btn active" data-section="found">Found Items</button>
+                    <button class="nav-btn" data-section="claim">Claims</button>
+                </div>
+                
+                <!-- Admin Navigation -->
+                <div id="admin-nav" class="nav-group" style="display: none;">
+                    <button class="nav-btn active" data-section="found">Found Items</button>
+                    <button class="nav-btn" data-section="claim">Claims</button>
+                    <button class="nav-btn" data-section="archived">Archived Claims</button>
+                </div>
+                
                 <div class="auth-buttons">
                     <button id="login-btn" class="auth-btn">Login</button>
                     <button id="register-btn" class="auth-btn">Register</button>
                     <div id="user-info" class="user-info" style="display: none;">
                         <span id="user-name"></span>
+                        <span id="user-role" class="user-role"></span>
                         <button id="logout-btn" class="auth-btn">Logout</button>
                     </div>
                 </div>
@@ -169,6 +180,23 @@
                         <i class="fas fa-ticket-alt"></i> Submit Claim
                     </button>
                 </form>
+            </section>
+
+            <!-- Archived Claims Section (Admin Only) -->
+            <section id="archived-section" class="section">
+                <div class="section-header">
+                    <h2><i class="fas fa-archive"></i> Archived Claims</h2>
+                    <p class="section-subtitle">View and manage completed or archived claims</p>
+                </div>
+                
+                <div id="archived-claims-grid" class="items-grid">
+                    <!-- Archived claims will be dynamically loaded here -->
+                </div>
+                
+                <div id="no-archived-claims" class="no-items" style="display: none;">
+                    <i class="fas fa-archive"></i>
+                    <p>No archived claims found.</p>
+                </div>
             </section>
         </div>
     </main>

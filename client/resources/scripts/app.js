@@ -7,21 +7,25 @@ class LostAndFoundApp {
         this.currentFilter = '';
         this.currentSearch = '';
         
+        // Check authentication and update UI immediately
+        this.checkAuthenticationAndUpdateUI();
         this.init();
     }
 
     async init() {
+        // Check authentication first
+        if (!this.checkAuthentication()) {
+            return;
+        }
+        
         this.setupEventListeners();
         await this.loadFoundItems();
         this.setCurrentDate();
-        this.checkAuthStatus();
     }
 
     setupEventListeners() {
         // Navigation
-        document.querySelectorAll('.nav-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => this.switchSection(e.target.dataset.section));
-        });
+        this.attachNavigationListeners();
 
         // Authentication
         document.getElementById('login-btn').addEventListener('click', () => this.openLoginModal());
@@ -56,6 +60,14 @@ class LostAndFoundApp {
                 const card = e.target.closest('.item-card');
                 const itemId = card.getAttribute('data-id');
                 this.openClaimModal(itemId);
+            } else if (e.target.closest('.delete-btn')) {
+                const card = e.target.closest('.item-card');
+                const itemId = card.getAttribute('data-id');
+                this.deleteItem(itemId);
+            } else if (e.target.closest('.complete-btn')) {
+                const card = e.target.closest('.item-card');
+                const itemId = card.getAttribute('data-id');
+                this.markAsComplete(itemId);
             }
         });
 
@@ -104,6 +116,22 @@ class LostAndFoundApp {
                 this.closeRegisterModal();
             }
         });
+    }
+
+    attachNavigationListeners() {
+        // Remove existing listeners to avoid duplicates
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.removeEventListener('click', this.handleNavigationClick);
+        });
+        
+        // Add new listeners
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.addEventListener('click', this.handleNavigationClick.bind(this));
+        });
+    }
+
+    handleNavigationClick(e) {
+        this.switchSection(e.target.dataset.section);
     }
 
     // Authentication Methods
@@ -176,8 +204,13 @@ class LostAndFoundApp {
 
     logout() {
         this.currentUser = null;
-        this.updateAuthUI();
-        this.showMessage('Logged out successfully.', 'success');
+        localStorage.removeItem('user');
+        this.showMessage('Logged out successfully. Redirecting...', 'success');
+        
+        // Redirect to login page after a short delay
+        setTimeout(() => {
+            window.location.href = 'login.html';
+        }, 1500);
     }
 
     isCrimsonEmail(email) {
@@ -189,16 +222,76 @@ class LostAndFoundApp {
         const registerBtn = document.getElementById('register-btn');
         const userInfo = document.getElementById('user-info');
         const userName = document.getElementById('user-name');
+        const userRole = document.getElementById('user-role');
+        const studentNav = document.getElementById('student-nav');
+        const adminNav = document.getElementById('admin-nav');
 
         if (this.currentUser) {
             loginBtn.style.display = 'none';
             registerBtn.style.display = 'none';
             userInfo.style.display = 'flex';
-            userName.textContent = this.currentUser.name;
+            userName.textContent = this.currentUser.name.toLowerCase();
+            userRole.style.display = 'none'; // Hide the role display
+            
+            // Show appropriate navigation based on role
+            if (this.currentUser.role === 'admin') {
+                studentNav.style.display = 'none';
+                adminNav.style.display = 'flex';
+            } else {
+                studentNav.style.display = 'flex';
+                adminNav.style.display = 'none';
+            }
+            
+            // Re-attach event listeners to ensure admin buttons work
+            this.attachNavigationListeners();
         } else {
             loginBtn.style.display = 'block';
             registerBtn.style.display = 'block';
             userInfo.style.display = 'none';
+            studentNav.style.display = 'flex';
+            adminNav.style.display = 'none';
+        }
+    }
+
+    checkAuthenticationAndUpdateUI() {
+        // Check if user is logged in via localStorage
+        const user = localStorage.getItem('user');
+        if (!user) {
+            // Redirect to login page
+            window.location.href = 'login.html';
+            return false;
+        }
+        
+        try {
+            this.currentUser = JSON.parse(user);
+            // Update UI immediately
+            this.updateAuthUI();
+            return true;
+        } catch (e) {
+            // Invalid user data, redirect to login
+            localStorage.removeItem('user');
+            window.location.href = 'login.html';
+            return false;
+        }
+    }
+
+    checkAuthentication() {
+        // Check if user is logged in via localStorage
+        const user = localStorage.getItem('user');
+        if (!user) {
+            // Redirect to login page
+            window.location.href = 'login.html';
+            return false;
+        }
+        
+        try {
+            this.currentUser = JSON.parse(user);
+            return true;
+        } catch (e) {
+            // Invalid user data, redirect to login
+            localStorage.removeItem('user');
+            window.location.href = 'login.html';
+            return false;
         }
     }
 
@@ -242,6 +335,98 @@ class LostAndFoundApp {
         } catch (error) {
             console.error('Error loading items:', error);
             this.foundItems = [];
+        }
+    }
+
+    async loadArchivedClaims() {
+        try {
+            // For now, we'll simulate archived claims data
+            // In a real app, this would fetch from your API
+            const archivedClaims = [
+                {
+                    id: 1,
+                    itemName: "iPhone 13",
+                    description: "Black iPhone 13 with cracked screen",
+                    building: "Bruno",
+                    room: "201",
+                    dateFound: "2024-01-15",
+                    claimerName: "John Doe",
+                    claimerEmail: "john.doe@crimson.ua.edu",
+                    claimDate: "2024-01-16",
+                    status: "completed"
+                },
+                {
+                    id: 2,
+                    itemName: "MacBook Pro",
+                    description: "Silver MacBook Pro 13-inch",
+                    building: "Hewson",
+                    room: "Lab A",
+                    dateFound: "2024-01-10",
+                    claimerName: "Jane Smith",
+                    claimerEmail: "jane.smith@crimson.ua.edu",
+                    claimDate: "2024-01-12",
+                    status: "completed"
+                }
+            ];
+            
+            this.displayArchivedClaims(archivedClaims);
+        } catch (error) {
+            console.error('Error loading archived claims:', error);
+            this.showMessage('Failed to load archived claims.', 'error');
+        }
+    }
+
+    async deleteItem(itemId) {
+        if (!this.currentUser || this.currentUser.role !== 'admin') {
+            this.showMessage('Only admins can delete items.', 'error');
+            return;
+        }
+
+        if (!confirm('Are you sure you want to delete this item? This action cannot be undone.')) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`${this.apiBaseUrl}/item/${itemId}`, {
+                method: 'DELETE'
+            });
+            
+            if (response.ok) {
+                this.showMessage('Item deleted successfully.', 'success');
+                await this.loadFoundItems(); // Reload the items
+            } else {
+                this.showMessage('Failed to delete item. Please try again.', 'error');
+            }
+        } catch (error) {
+            console.error('Error deleting item:', error);
+            this.showMessage('Network error. Please try again.', 'error');
+        }
+    }
+
+    async markAsComplete(itemId) {
+        if (!this.currentUser || this.currentUser.role !== 'admin') {
+            this.showMessage('Only admins can mark items as complete.', 'error');
+            return;
+        }
+
+        if (!confirm('Are you sure you want to mark this item as complete? This will move it to archived claims.')) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`${this.apiBaseUrl}/item/${itemId}/complete`, {
+                method: 'PUT'
+            });
+            
+            if (response.ok) {
+                this.showMessage('Item marked as complete successfully.', 'success');
+                await this.loadFoundItems(); // Reload the items
+            } else {
+                this.showMessage('Failed to mark item as complete. Please try again.', 'error');
+            }
+        } catch (error) {
+            console.error('Error marking item as complete:', error);
+            this.showMessage('Network error. Please try again.', 'error');
         }
     }
 
@@ -379,11 +564,23 @@ class LostAndFoundApp {
 
     // UI Methods
     switchSection(sectionName) {
-        // Update navigation
+        // Update navigation - remove active from all buttons
         document.querySelectorAll('.nav-btn').forEach(btn => {
             btn.classList.remove('active');
         });
-        document.querySelector(`[data-section="${sectionName}"]`).classList.add('active');
+        
+        // Add active to the correct button based on current user role
+        if (this.currentUser && this.currentUser.role === 'admin') {
+            const adminBtn = document.querySelector(`#admin-nav [data-section="${sectionName}"]`);
+            if (adminBtn) {
+                adminBtn.classList.add('active');
+            }
+        } else {
+            const studentBtn = document.querySelector(`#student-nav [data-section="${sectionName}"]`);
+            if (studentBtn) {
+                studentBtn.classList.add('active');
+            }
+        }
 
         // Update sections
         document.querySelectorAll('.section').forEach(section => {
@@ -391,12 +588,17 @@ class LostAndFoundApp {
         });
         document.getElementById(`${sectionName}-section`).classList.add('active');
 
-        // Show/hide floating button
+        // Show/hide floating button based on role and section (only for admins)
         const floatingBtn = document.getElementById('add-found-btn');
-        if (sectionName === 'found') {
+        if (sectionName === 'found' && this.currentUser && this.currentUser.role === 'admin') {
             floatingBtn.style.display = 'block';
         } else {
             floatingBtn.style.display = 'none';
+        }
+
+        // Load section-specific data
+        if (sectionName === 'archived' && this.currentUser && this.currentUser.role === 'admin') {
+            this.loadArchivedClaims();
         }
 
         // Set current date for claim form when switching to claim section
@@ -432,9 +634,79 @@ class LostAndFoundApp {
         grid.innerHTML = filteredItems.map(item => this.createItemCard(item)).join('');
     }
 
+    displayArchivedClaims(claims) {
+        const grid = document.getElementById('archived-claims-grid');
+        const noClaims = document.getElementById('no-archived-claims');
+        
+        if (claims.length === 0) {
+            grid.style.display = 'none';
+            noClaims.style.display = 'block';
+            return;
+        }
+
+        grid.style.display = 'grid';
+        noClaims.style.display = 'none';
+
+        grid.innerHTML = claims.map(claim => this.createArchivedClaimCard(claim)).join('');
+    }
+
+    createArchivedClaimCard(claim) {
+        const foundDate = new Date(claim.dateFound).toLocaleDateString();
+        const claimDate = new Date(claim.claimDate).toLocaleDateString();
+        const roomText = claim.room ? `, Room ${claim.room}` : '';
+        
+        return `
+            <div class="item-card archived-claim-card" data-id="${claim.id}">
+                <div class="item-header">
+                    <h3 class="item-name">${this.escapeHtml(claim.itemName)}</h3>
+                    <span class="item-date">Completed ${claimDate}</span>
+                </div>
+                <p class="item-description">${this.escapeHtml(claim.description)}</p>
+                <div class="item-location">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>${this.escapeHtml(claim.building)}${roomText}</span>
+                </div>
+                <div class="claim-details">
+                    <p><strong>Found:</strong> ${foundDate}</p>
+                    <p><strong>Claimed by:</strong> ${this.escapeHtml(claim.claimerName)}</p>
+                    <p><strong>Email:</strong> ${this.escapeHtml(claim.claimerEmail)}</p>
+                </div>
+                <div class="item-actions">
+                    <span class="status-badge completed">Completed</span>
+                </div>
+            </div>          
+        `;
+    }
+
     createItemCard(item) {
         const date = new Date(item.dateFound).toLocaleDateString();
         const roomText = item.room ? `, Room ${item.room}` : '';
+        
+        // Show different actions based on user role
+        let actionsHtml = '';
+        if (this.currentUser && this.currentUser.role === 'admin') {
+            actionsHtml = `
+                <div class="item-actions">
+                    <button class="claim-btn" title="Claim Item" data-item-id="${item.id}">
+                        <i class="fas fa-ticket-alt"></i> Claim
+                    </button>
+                    <button class="complete-btn" title="Mark as Complete" data-item-id="${item.id}">
+                        <i class="fas fa-check"></i> Complete
+                    </button>
+                    <button class="delete-btn" title="Delete Item" data-item-id="${item.id}">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                </div>
+            `;
+        } else {
+            actionsHtml = `
+                <div class="item-actions">
+                    <button class="claim-btn" title="Claim Item" data-item-id="${item.id}">
+                        <i class="fas fa-ticket-alt"></i> Claim
+                    </button>
+                </div>
+            `;
+        }
         
         return `
             <div class="item-card" data-id="${item.id}">
@@ -447,11 +719,7 @@ class LostAndFoundApp {
                     <i class="fas fa-map-marker-alt"></i>
                     <span>${this.escapeHtml(item.building)}${roomText}</span>
                 </div>
-                <div class="item-actions">
-                    <button class="claim-btn" title="Claim Item" data-item-id="${item.id}">
-                        <i class="fas fa-ticket-alt"></i> Claim
-                    </button>
-                </div>
+                ${actionsHtml}
             </div>          
         `;
     }

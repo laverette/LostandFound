@@ -60,6 +60,12 @@ body {
     align-items: center;
 }
 
+.nav-group {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
 .auth-buttons {
     display: flex;
     gap: 0.5rem;
@@ -95,6 +101,15 @@ body {
     color: #9E1B32;
 }
 
+.user-role {
+    font-size: 0.8rem;
+    color: #718096;
+    background: rgba(158, 27, 50, 0.1);
+    padding: 0.25rem 0.5rem;
+    border-radius: 10px;
+    text-transform: capitalize;
+}
+
 .nav-btn {
     padding: 0.75rem 1.5rem;
     border: none;
@@ -113,9 +128,46 @@ body {
 }
 
 .nav-btn.active {
-    background: linear-gradient(135deg, #9E1B32, #C8102E);
-    color: white;
-    box-shadow: 0 4px 15px rgba(158, 27, 50, 0.3);
+    background: linear-gradient(135deg, #9E1B32, #C8102E) !important;
+    color: white !important;
+    box-shadow: 0 4px 15px rgba(158, 27, 50, 0.3) !important;
+}
+
+/* Ensure active state works for all navigation buttons */
+.nav-btn[data-section="found"].active,
+.nav-btn[data-section="missing"].active,
+.nav-btn[data-section="claim"].active,
+.nav-btn[data-section="archived"].active {
+    background: linear-gradient(135deg, #9E1B32, #C8102E) !important;
+    color: white !important;
+    box-shadow: 0 4px 15px rgba(158, 27, 50, 0.3) !important;
+}
+
+/* Specific rules for admin navigation buttons */
+#admin-nav .nav-btn.active {
+    background: linear-gradient(135deg, #9E1B32, #C8102E) !important;
+    color: white !important;
+    box-shadow: 0 4px 15px rgba(158, 27, 50, 0.3) !important;
+}
+
+/* Specific rules for student navigation buttons */
+#student-nav .nav-btn.active {
+    background: linear-gradient(135deg, #9E1B32, #C8102E) !important;
+    color: white !important;
+    box-shadow: 0 4px 15px rgba(158, 27, 50, 0.3) !important;
+}
+
+/* Make Found Items and Report Missing buttons match Claims button size */
+.nav-btn[data-section="found"],
+.nav-btn[data-section="missing"] {
+    min-width: 80px;
+    padding: 0.75rem 1.5rem;
+    text-align: center;
+}
+
+/* Specific padding for Archived Claims button */
+.nav-btn[data-section="archived"] {
+    padding: 0.35rem 1.5rem;
 }
 
 /* Main Content */
@@ -610,6 +662,26 @@ body {
     background: #c53030;
 }
 
+.complete-btn {
+    background: #38a169;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1;
+}
+
+.complete-btn:hover {
+    background: #2f855a;
+}
+
 .item-preview-card {
     background: #f7fafc;
     border: 1px solid #e2e8f0;
@@ -628,5 +700,42 @@ body {
     margin: 0.25rem 0;
     color: #4a5568;
     font-size: 0.9rem;
+}
+
+/* Archived Claims Styles */
+.archived-claim-card {
+    border-left: 4px solid #48bb78;
+}
+
+.claim-details {
+    background: #f7fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 1rem 0;
+}
+
+.claim-details p {
+    margin: 0.5rem 0;
+    color: #4a5568;
+    font-size: 0.9rem;
+}
+
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.status-badge.completed {
+    background: linear-gradient(135deg, #48bb78, #38a169);
+    color: white;
+}
+
+/* Hide Report Missing section for students */
+#missing-section {
+    display: none;
 }
 

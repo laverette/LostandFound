@@ -1,4 +1,4 @@
-# Project Technology Stack & Guidelines
+ # Project Technology Stack & Guidelines
 
 ## Frontend
 - **HTML/CSS**: Single-page application with one `index.html` file containing a div with id="app"
