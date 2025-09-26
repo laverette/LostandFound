@@ -17,7 +17,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="resources/styles/auth.css">
+    <link rel="stylesheet" href="resources/styles/index.css">
 </head>
 <body>
     <div class="auth-container">
@@ -27,68 +27,65 @@
                 <p class="auth-subtitle">Helping Crimson Tide students find their lost items</p>
             </div>
 
-            <!-- Login Form -->
-            <div id="login-form-container" class="auth-form-container">
-                <h2><i class="fas fa-sign-in-alt"></i> Login</h2>
-                <form id="login-form" class="auth-form">
-                    <div class="form-group">
-                        <label for="login-email">Crimson Email *</label>
-                        <input type="email" id="login-email" name="email" required placeholder="your.name@crimson.ua.edu">
-                        <small class="form-text">Only @crimson.ua.edu email addresses are allowed</small>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="login-role">Role *</label>
-                        <select id="login-role" name="role" required>
-                            <option value="">Select Role</option>
-                            <option value="student">Student</option>
-                            <option value="admin">Admin</option>
-                        </select>
-                    </div>
-                    
-                    <button type="submit" class="btn btn-primary auth-btn">
-                        <i class="fas fa-sign-in-alt"></i> Login
+            <!-- Role Selection -->
+            <div id="role-selection" class="auth-form-container">
+                <h2><i class="fas fa-sign-in-alt"></i> Choose Your Role</h2>
+                <div class="role-buttons">
+                    <button id="student-login-btn" class="btn btn-primary role-btn">
+                        <i class="fas fa-user-graduate"></i> Student
                     </button>
-                </form>
-                
-                <div class="auth-switch">
-                    <p>Don't have an account? <a href="#" id="show-register">Register here</a></p>
+                    <button id="admin-login-btn" class="btn btn-primary role-btn">
+                        <i class="fas fa-user-shield"></i> Admin
+                    </button>
                 </div>
             </div>
 
-            <!-- Register Form -->
-            <div id="register-form-container" class="auth-form-container" style="display: none;">
-                <h2><i class="fas fa-user-plus"></i> Register</h2>
-                <form id="register-form" class="auth-form">
+            <!-- Student Login Form -->
+            <div id="student-login-container" class="auth-form-container" style="display: none;">
+                <h2><i class="fas fa-user-graduate"></i> Student Login</h2>
+                <form id="student-login-form" class="auth-form">
                     <div class="form-group">
-                        <label for="register-name">Full Name *</label>
-                        <input type="text" id="register-name" name="name" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="register-email">Crimson Email *</label>
-                        <input type="email" id="register-email" name="email" required placeholder="your.name@crimson.ua.edu">
+                        <label for="student-email">Crimson Email *</label>
+                        <input type="email" id="student-email" name="email" required placeholder="your.name@crimson.ua.edu">
                         <small class="form-text">Only @crimson.ua.edu email addresses are allowed</small>
                     </div>
                     
-                    <div class="form-group">
-                        <label for="register-role">Role *</label>
-                        <select id="register-role" name="role" required>
-                            <option value="">Select Role</option>
-                            <option value="student">Student</option>
-                            <option value="admin">Admin</option>
-                        </select>
-                    </div>
-                    
                     <button type="submit" class="btn btn-primary auth-btn">
-                        <i class="fas fa-user-plus"></i> Register
+                        <i class="fas fa-sign-in-alt"></i> Login as Student
                     </button>
                 </form>
                 
                 <div class="auth-switch">
-                    <p>Already have an account? <a href="#" id="show-login">Login here</a></p>
+                    <p><a href="#" id="back-to-role-selection">← Back to Role Selection</a></p>
                 </div>
             </div>
+
+            <!-- Admin Login Form -->
+            <div id="admin-login-container" class="auth-form-container" style="display: none;">
+                <h2><i class="fas fa-user-shield"></i> Admin Login</h2>
+                <form id="admin-login-form" class="auth-form">
+                    <div class="form-group">
+                        <label for="admin-email">Crimson Email *</label>
+                        <input type="email" id="admin-email" name="email" required value="lostf@crimson.ua.edu" readonly>
+                        <small class="form-text">Admin email is pre-filled</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="admin-password">Password *</label>
+                        <input type="password" id="admin-password" name="password" required placeholder="Enter admin password">
+                        <small class="form-text">Enter the admin password</small>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary auth-btn">
+                        <i class="fas fa-sign-in-alt"></i> Login as Admin
+                    </button>
+                </form>
+                
+                <div class="auth-switch">
+                    <p><a href="#" id="back-to-role-selection-admin">← Back to Role Selection</a></p>
+                </div>
+            </div>
+
 
             <!-- Success/Error Messages -->
             <div id="auth-message" class="alert" style="display: none;"></div>
@@ -103,6 +100,7 @@
     ></script>
     
     <!-- Custom JS -->
-    <script src="resources/scripts/auth.js"></script>
+    <script src="resources/scripts/login.js"></script>
 </body>
 </html>
+

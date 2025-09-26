@@ -78,7 +78,7 @@ body {
     background: transparent;
     color: #9E1B32;
     font-weight: 600;
-    border-radius: 20px;
+    border-radius: 25px;
     cursor: pointer;
     transition: all 0.3s ease;
     font-size: 0.9rem;
@@ -87,6 +87,11 @@ body {
 .auth-btn:hover {
     background: #9E1B32;
     color: white;
+}
+
+/* Ensure logout button has rounded styling */
+#logout-btn {
+    border-radius: 25px !important;
 }
 
 .user-info {
@@ -161,8 +166,13 @@ body {
 .nav-btn[data-section="found"],
 .nav-btn[data-section="missing"] {
     min-width: 80px;
-    padding: 0.75rem 1.5rem;
+    padding: 0.35rem 1.5rem;
     text-align: center;
+}
+
+/* Ensure admin navigation found items button also has the same padding */
+#admin-nav .nav-btn[data-section="found"] {
+    padding: 0.35rem 1.5rem;
 }
 
 /* Specific padding for Archived Claims button */
@@ -737,5 +747,211 @@ body {
 /* Hide Report Missing section for students */
 #missing-section {
     display: none;
+}
+
+/* Login Page Styles */
+.auth-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+    padding: 2rem;
+}
+
+.auth-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    padding: 3rem;
+    max-width: 500px;
+    width: 100%;
+    text-align: center;
+}
+
+.auth-header h1 {
+    color: #9E1B32;
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.auth-header h1 i {
+    margin-right: 0.5rem;
+}
+
+.auth-subtitle {
+    color: #718096;
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+}
+
+.auth-form-container h2 {
+    color: #2d3748;
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 2rem;
+}
+
+.auth-form-container h2 i {
+    margin-right: 0.5rem;
+    color: #9E1B32;
+}
+
+.role-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+.role-btn {
+    background: linear-gradient(135deg, #9E1B32, #C8102E);
+    border: none;
+    border-radius: 15px;
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.role-btn:hover {
+    background: linear-gradient(135deg, #C8102E, #9E1B32);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(158, 27, 50, 0.3);
+}
+
+.role-btn i {
+    font-size: 1.2rem;
+}
+
+.auth-form {
+    text-align: left;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #9E1B32;
+    box-shadow: 0 0 0 3px rgba(158, 27, 50, 0.1);
+}
+
+.form-group input[readonly] {
+    background-color: #f7fafc;
+    color: #718096;
+}
+
+.form-text {
+    font-size: 0.875rem;
+    color: #718096;
+    margin-top: 0.25rem;
+}
+
+.auth-btn {
+    background: linear-gradient(135deg, #9E1B32, #C8102E);
+    border: none;
+    border-radius: 10px;
+    padding: 0.75rem 2rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.auth-btn:hover {
+    background: linear-gradient(135deg, #C8102E, #9E1B32);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(158, 27, 50, 0.3);
+}
+
+.auth-switch {
+    margin-top: 1.5rem;
+    text-align: center;
+}
+
+.auth-switch a {
+    color: #9E1B32;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.auth-switch a:hover {
+    color: #C8102E;
+    text-decoration: underline;
+}
+
+.alert {
+    padding: 1rem;
+    border-radius: 10px;
+    margin-top: 1rem;
+    font-weight: 500;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* Responsive design for login page */
+@media (max-width: 768px) {
+    .auth-container {
+        padding: 1rem;
+    }
+    
+    .auth-card {
+        padding: 2rem;
+    }
+    
+    .role-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .role-btn {
+        width: 100%;
+        max-width: 200px;
+    }
 }
 

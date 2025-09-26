@@ -223,23 +223,26 @@ class LostAndFoundApp {
         const userInfo = document.getElementById('user-info');
         const userName = document.getElementById('user-name');
         const userRole = document.getElementById('user-role');
+        const logoutBtn = document.getElementById('logout-btn');
         const studentNav = document.getElementById('student-nav');
         const adminNav = document.getElementById('admin-nav');
 
         if (this.currentUser) {
             loginBtn.style.display = 'none';
             registerBtn.style.display = 'none';
-            userInfo.style.display = 'flex';
-            userName.textContent = this.currentUser.name.toLowerCase();
+            logoutBtn.style.display = 'block';
             userRole.style.display = 'none'; // Hide the role display
             
             // Show appropriate navigation based on role
             if (this.currentUser.role === 'admin') {
                 studentNav.style.display = 'none';
                 adminNav.style.display = 'flex';
+                userInfo.style.display = 'none'; // Hide username for admin
             } else {
                 studentNav.style.display = 'flex';
                 adminNav.style.display = 'none';
+                userInfo.style.display = 'flex'; // Show username for student
+                userName.textContent = this.currentUser.name.toLowerCase();
             }
             
             // Re-attach event listeners to ensure admin buttons work
@@ -247,6 +250,7 @@ class LostAndFoundApp {
         } else {
             loginBtn.style.display = 'block';
             registerBtn.style.display = 'block';
+            logoutBtn.style.display = 'none';
             userInfo.style.display = 'none';
             studentNav.style.display = 'flex';
             adminNav.style.display = 'none';
