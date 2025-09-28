@@ -265,7 +265,8 @@ class LostAndFoundApp {
                     const claimId = card.getAttribute('data-claim-id');
                     const claim = this.claims.find(c => c.id === claimId);
                     if (claim) {
-                        const itemName = claim.item?.name || 'Unknown Item';
+                        const item = this.foundItems.find(item => item.id === claim.itemId);
+                        const itemName = item?.name || 'Unknown Item';
                         this.emailClaimant(claim.claimerEmail, itemName);
                     }
                 }
@@ -340,6 +341,65 @@ class LostAndFoundApp {
                 this.closeClaimModal();
             }
         });
+        }
+
+        // Resolve claim modal events
+        const resolveClaimModal = document.getElementById('resolve-claim-modal');
+        if (resolveClaimModal) {
+            resolveClaimModal.addEventListener('click', (e) => {
+                if (e.target.id === 'resolve-claim-modal') {
+                    this.closeResolveClaimModal();
+                }
+            });
+        }
+
+        // Resolve claim modal buttons
+        const resolveSuccessBtn = document.getElementById('resolve-success-btn');
+        const resolveKeepBtn = document.getElementById('resolve-keep-btn');
+        const resolveCancelBtn = document.getElementById('resolve-cancel-btn');
+
+        if (resolveSuccessBtn) {
+            resolveSuccessBtn.addEventListener('click', () => {
+                this.handleResolveClaimChoice(true); // Remove item
+            });
+        }
+
+        if (resolveKeepBtn) {
+            resolveKeepBtn.addEventListener('click', () => {
+                this.handleResolveClaimChoice(false); // Keep item visible
+            });
+        }
+
+        if (resolveCancelBtn) {
+            resolveCancelBtn.addEventListener('click', () => {
+                this.closeResolveClaimModal();
+            });
+        }
+
+        // Claim confirmation modal events
+        const claimConfirmationModal = document.getElementById('claim-confirmation-modal');
+        if (claimConfirmationModal) {
+            claimConfirmationModal.addEventListener('click', (e) => {
+                if (e.target.id === 'claim-confirmation-modal') {
+                    this.closeClaimConfirmationModal();
+                }
+            });
+        }
+
+        // Claim confirmation modal buttons
+        const claimConfirmBtn = document.getElementById('claim-confirm-btn');
+        const claimCancelBtn = document.getElementById('claim-cancel-btn');
+
+        if (claimConfirmBtn) {
+            claimConfirmBtn.addEventListener('click', () => {
+                this.handleClaimConfirmation();
+            });
+        }
+
+        if (claimCancelBtn) {
+            claimCancelBtn.addEventListener('click', () => {
+                this.closeClaimConfirmationModal();
+            });
         }
     }
 
@@ -653,35 +713,133 @@ class LostAndFoundApp {
             return;
         }
 
-        if (confirm('Are you sure you want to delete this item? This will also delete all associated claims.')) {
-            try {
-                const response = await fetch(`${this.apiBaseUrl}/founditems/${itemId}`, {
-                    method: 'DELETE'
-                });
-
-                if (response.ok) {
-                    // Remove the item from local array
-                    this.foundItems = this.foundItems.filter(item => item.id !== itemId);
-                    
-                    // Remove all claims associated with this item from local array
-                    this.claims = this.claims.filter(claim => claim.itemId !== itemId);
-                    
-                    // Re-render both views
-                    this.renderFoundItems();
-                    if (this.userType === 'admin') {
-                        this.renderClaimsManagement();
-                        this.renderArchive();
-                    }
-                    
-                    this.showSuccessMessage('Item and all associated claims deleted successfully.');
-                } else {
-                    this.showErrorMessage('Failed to delete item');
-                }
-            } catch (error) {
-                console.error('Delete item error:', error);
-                this.showErrorMessage('Failed to delete item. Please try again.');
-            }
+        // Find the item to get its details
+        const item = this.foundItems.find(item => item.id === itemId);
+        if (!item) {
+            console.error('Item not found for deletion');
+            return;
         }
+
+        // Count associated claims
+        const associatedClaims = this.claims.filter(claim => claim.itemId === itemId);
+        const claimCount = associatedClaims.length;
+
+        // Show the custom delete confirmation modal
+        this.showDeleteConfirmationModal(item, claimCount, itemId);
+    }
+
+    showDeleteConfirmationModal(item, claimCount, itemId) {
+        // Populate modal with item details
+        document.getElementById('delete-confirmation-item-name').textContent = item.name;
+        document.getElementById('delete-confirmation-item-location').textContent = 
+            `${item.building}${item.room ? `, Room ${item.room}` : ''}`;
+        document.getElementById('delete-confirmation-item-date').textContent = 
+            new Date(item.dateFound).toLocaleDateString();
+        document.getElementById('delete-confirmation-claim-count').textContent = 
+            `${claimCount} claim${claimCount !== 1 ? 's' : ''}`;
+
+        // Clear the confirmation input
+        const confirmInput = document.getElementById('delete-confirmation-text');
+        confirmInput.value = '';
+        confirmInput.focus();
+
+        // Show the modal
+        document.getElementById('delete-confirmation-modal').classList.add('active');
+        document.body.style.overflow = 'hidden';
+
+        // Set up event listeners
+        this.setupDeleteModalListeners(itemId);
+    }
+
+    setupDeleteModalListeners(itemId) {
+        const modal = document.getElementById('delete-confirmation-modal');
+        const confirmInput = document.getElementById('delete-confirmation-text');
+        const confirmBtn = document.getElementById('delete-confirm-btn');
+        const cancelBtn = document.getElementById('delete-cancel-btn');
+
+        // Remove existing listeners to prevent duplicates
+        const newConfirmBtn = confirmBtn.cloneNode(true);
+        const newCancelBtn = cancelBtn.cloneNode(true);
+        const newInput = confirmInput.cloneNode(true);
+        
+        confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+        cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
+        confirmInput.parentNode.replaceChild(newInput, confirmInput);
+
+        // Update references
+        const updatedConfirmBtn = document.getElementById('delete-confirm-btn');
+        const updatedCancelBtn = document.getElementById('delete-cancel-btn');
+        const updatedInput = document.getElementById('delete-confirmation-text');
+
+        // Input validation
+        updatedInput.addEventListener('input', (e) => {
+            const isValid = e.target.value.trim() === 'DELETE';
+            updatedConfirmBtn.disabled = !isValid;
+        });
+
+        // Confirm deletion
+        updatedConfirmBtn.addEventListener('click', async () => {
+            if (updatedInput.value.trim() === 'DELETE') {
+                await this.performDelete(itemId);
+                this.closeDeleteModal();
+            }
+        });
+
+        // Cancel deletion
+        updatedCancelBtn.addEventListener('click', () => {
+            this.closeDeleteModal();
+        });
+
+        // Close on escape key
+        const handleEscape = (e) => {
+            if (e.key === 'Escape') {
+                this.closeDeleteModal();
+                document.removeEventListener('keydown', handleEscape);
+            }
+        };
+        document.addEventListener('keydown', handleEscape);
+
+        // Close on backdrop click
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                this.closeDeleteModal();
+            }
+        });
+    }
+
+    async performDelete(itemId) {
+        try {
+            const response = await fetch(`${this.apiBaseUrl}/founditems/${itemId}`, {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                // Remove the item from local array
+                this.foundItems = this.foundItems.filter(item => item.id !== itemId);
+                
+                // Remove all claims associated with this item from local array
+                this.claims = this.claims.filter(claim => claim.itemId !== itemId);
+                
+                // Re-render both views
+                this.renderFoundItems();
+                if (this.userType === 'admin') {
+                    this.renderClaimsManagement();
+                    this.renderArchive();
+                }
+                
+                this.showSuccessMessage('Item and all associated claims deleted successfully.');
+            } else {
+                this.showErrorMessage('Failed to delete item');
+            }
+        } catch (error) {
+            console.error('Delete item error:', error);
+            this.showErrorMessage('Failed to delete item. Please try again.');
+        }
+    }
+
+    closeDeleteModal() {
+        document.getElementById('delete-confirmation-modal').classList.remove('active');
+        document.body.style.overflow = '';
     }
 
     async handleMissingItemSubmit(form) {
@@ -906,10 +1064,8 @@ class LostAndFoundApp {
             <span>${message}</span>
         `;
 
-        const container = document.querySelector('.container');
-        if (container) {
-        container.insertBefore(successDiv, container.firstChild);
-        }
+        // Insert message directly into body since it's fixed positioned
+        document.body.appendChild(successDiv);
 
         setTimeout(() => {
             successDiv.remove();
@@ -929,10 +1085,8 @@ class LostAndFoundApp {
             <span>${message}</span>
         `;
 
-        const container = document.querySelector('.auth-container') || document.querySelector('.container');
-        if (container) {
-            container.insertBefore(errorDiv, container.firstChild);
-        }
+        // Insert message directly into body since it's fixed positioned
+        document.body.appendChild(errorDiv);
 
         setTimeout(() => {
             errorDiv.remove();
@@ -989,6 +1143,11 @@ class LostAndFoundApp {
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
+    }
+
+    truncateText(text, maxLength) {
+        if (text.length <= maxLength) return text;
+        return text.substring(0, maxLength) + '...';
     }
 
     createItemCard(item) {
@@ -1060,11 +1219,12 @@ class LostAndFoundApp {
         const date = new Date(claim.dateSubmitted).toLocaleDateString();
         const roomText = claim.lastSeenRoom ? `, Room ${claim.lastSeenRoom}` : '';
         
-        // Get item details from the related item or use fallback values
-        const itemName = claim.item?.name || 'Unknown Item';
-        const itemDescription = claim.item?.description || 'No description available';
-        const itemBuilding = claim.item?.building || 'Unknown Building';
-        const itemRoom = claim.item?.room || '';
+        // Get item details by looking up the itemId in foundItems
+        const item = this.foundItems.find(item => item.id === claim.itemId);
+        const itemName = item?.name || 'Unknown Item';
+        const itemDescription = item?.description || 'No description available';
+        const itemBuilding = item?.building || 'Unknown Building';
+        const itemRoom = item?.room || '';
         const itemRoomText = itemRoom ? `, Room ${itemRoom}` : '';
         
         return `
@@ -1152,32 +1312,222 @@ class LostAndFoundApp {
             return;
         }
 
-        const itemName = claim.item?.name || 'Unknown Item';
-        if (confirm(`Are you sure you want to resolve this claim for "${itemName}"? This will move it to the archive.`)) {
-            try {
-                const response = await fetch(`${this.apiBaseUrl}/claims/${claimId}/resolve`, {
-                    method: 'PUT'
-                });
+        const item = this.foundItems.find(item => item.id === claim.itemId);
+        const itemName = item?.name || 'Unknown Item';
+        
+        // Show admin resolve modal
+        this.showResolveClaimModal(claimId, itemName);
+    }
 
-                if (response.ok) {
-                    // Remove claim from local array (soft delete)
-                    this.claims = this.claims.filter(c => c.id !== claimId);
-                    
-                    // Re-render views
-                    this.renderClaimsManagement();
-                    this.renderArchive();
-                    
-                    this.showSuccessMessage(`Claim for "${itemName}" resolved and moved to archive.`);
-                } else {
-                    this.showErrorMessage('Failed to resolve claim');
+    showResolveClaimModal(claimId, itemName) {
+        // Set the message
+        document.getElementById('resolve-claim-message').textContent = 
+            `Resolve claim for "${itemName}"?`;
+        
+        // Show the modal
+        document.getElementById('resolve-claim-modal').classList.add('active');
+        document.body.style.overflow = 'hidden';
+        
+        // Store the claim ID for later use
+        this.currentResolveClaimId = claimId;
+    }
+
+    closeResolveClaimModal() {
+        document.getElementById('resolve-claim-modal').classList.remove('active');
+        document.body.style.overflow = 'auto';
+        this.currentResolveClaimId = null;
+    }
+
+    async handleResolveClaimChoice(removeItem) {
+        const claimId = this.currentResolveClaimId;
+        if (!claimId) return;
+        
+        const claim = this.claims.find(c => c.id === claimId);
+        if (!claim) return;
+        
+        const item = this.foundItems.find(item => item.id === claim.itemId);
+        const itemName = item?.name || 'Unknown Item';
+        
+        try {
+            const response = await fetch(`${this.apiBaseUrl}/claims/${claimId}/resolve`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    resolvedBy: this.currentUser.id
+                })
+            });
+
+            if (response.ok) {
+                // Update the claim status to resolved (1)
+                const claimToUpdate = this.claims.find(c => c.id === claimId);
+                if (claimToUpdate) {
+                    claimToUpdate.status = 1; // ClaimStatus.Resolved
+                    claimToUpdate.resolvedDate = new Date().toISOString();
+                    claimToUpdate.resolvedBy = this.currentUser.id;
                 }
-            } catch (error) {
-                console.error('Resolve claim error:', error);
-                this.showErrorMessage('Failed to resolve claim. Please try again.');
+                
+                // If admin chose to remove item from listings
+                if (removeItem) {
+                    try {
+                        const deleteResponse = await fetch(`${this.apiBaseUrl}/founditems/${claim.itemId}/hide`, {
+                            method: 'PUT'
+                        });
+                        
+                        if (deleteResponse.ok) {
+                            // Remove item from local foundItems array
+                            this.foundItems = this.foundItems.filter(item => item.id !== claim.itemId);
+                            
+                            // Remove all other pending claims for this item since it's been claimed
+                            const claimsToRemove = this.claims.filter(c => 
+                                c.itemId === claim.itemId && 
+                                c.id !== claimId && 
+                                (c.status === 'pending' || c.status === 0)
+                            );
+                            
+                            // Update claims to mark them as rejected since item was claimed by someone else
+                            claimsToRemove.forEach(claimToUpdate => {
+                                claimToUpdate.status = 2; // ClaimStatus.Rejected
+                                claimToUpdate.resolvedDate = new Date().toISOString();
+                                claimToUpdate.resolvedBy = this.currentUser.id;
+                            });
+                            
+                            this.showSuccessMessage(`Claim for "${itemName}" resolved and item removed from listings. ${claimsToRemove.length} other pending claims for this item have been automatically rejected.`);
+                        } else {
+                            this.showSuccessMessage(`Claim for "${itemName}" resolved, but failed to remove item from listings.`);
+                        }
+                    } catch (deleteError) {
+                        console.error('Hide item error:', deleteError);
+                        this.showSuccessMessage(`Claim for "${itemName}" resolved, but failed to remove item from listings.`);
+                    }
+                } else {
+                    this.showSuccessMessage(`Claim for "${itemName}" resolved. Item kept visible for other potential claimants.`);
+                }
+                
+                // Close modal and re-render views
+                this.closeResolveClaimModal();
+                this.renderClaimsManagement();
+                this.renderArchive();
+                this.renderFoundItems();
+            } else {
+                this.showErrorMessage('Failed to resolve claim');
             }
+        } catch (error) {
+            console.error('Resolve claim error:', error);
+            this.showErrorMessage('Failed to resolve claim. Please try again.');
         }
     }
 
+    showClaimConfirmationModal(item, claimerName, claimerEmail, ownershipDetails, formData) {
+        // Set item details
+        document.getElementById('claim-confirmation-item-name').textContent = item.name;
+        
+        const roomText = item.room ? `, Room ${item.room}` : '';
+        document.getElementById('claim-confirmation-item-location').textContent = `${item.building}${roomText}`;
+        
+        const dateFound = new Date(item.dateFound).toLocaleDateString();
+        document.getElementById('claim-confirmation-item-date').textContent = dateFound;
+        
+        // Set claimant information
+        document.getElementById('claim-confirmation-name').textContent = claimerName;
+        document.getElementById('claim-confirmation-email').textContent = claimerEmail;
+        
+        const lastSeenBuilding = formData.get('lastSeenBuilding');
+        const lastSeenRoom = formData.get('lastSeenRoom');
+        const lastSeenText = lastSeenRoom ? `${lastSeenBuilding}, Room ${lastSeenRoom}` : lastSeenBuilding;
+        document.getElementById('claim-confirmation-last-seen').textContent = lastSeenText;
+        
+        // Set ownership details (truncate if too long)
+        const truncatedOwnership = this.truncateText(ownershipDetails, 150);
+        document.getElementById('claim-confirmation-ownership').textContent = ownershipDetails;
+        
+        // Collapse ownership details by default
+        const ownershipContent = document.getElementById('ownership-details-content');
+        const ownershipChevron = document.getElementById('ownership-chevron');
+        if (ownershipContent && ownershipChevron) {
+            ownershipContent.style.display = 'none';
+            ownershipChevron.classList.remove('fa-chevron-up');
+            ownershipChevron.classList.add('fa-chevron-down');
+        }
+        
+        // Show the modal
+        document.getElementById('claim-confirmation-modal').classList.add('active');
+        document.body.style.overflow = 'hidden';
+        
+        // Store the form data for later use
+        this.pendingClaimData = {
+            item: item,
+            formData: formData
+        };
+    }
+
+    closeClaimConfirmationModal() {
+        document.getElementById('claim-confirmation-modal').classList.remove('active');
+        document.body.style.overflow = 'auto';
+        this.pendingClaimData = null;
+    }
+
+    async handleClaimConfirmation() {
+        if (!this.pendingClaimData) return;
+        
+        // Prevent double submission
+        if (this.isSubmittingClaim) return;
+        this.isSubmittingClaim = true;
+        
+        const { item, formData } = this.pendingClaimData;
+        const itemId = item.id;
+        
+        const claim = {
+            itemId: itemId,
+            claimerName: formData.get('claimerName'),
+            claimerEmail: formData.get('claimerEmail'),
+            lastSeenBuilding: formData.get('lastSeenBuilding'),
+            lastSeenRoom: formData.get('lastSeenRoom'),
+            ownershipDetails: formData.get('ownershipDetails'),
+            claimDate: formData.get('claimDate') || new Date().toISOString().split('T')[0],
+            claimedBy: this.currentUser.id
+        };
+
+        try {
+            const response = await fetch(`${this.apiBaseUrl}/claims`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(claim)
+            });
+
+            if (response.ok) {
+                const newClaim = await response.json();
+                this.claims.push(newClaim);
+                
+                // Close modal and redirect to found items page first
+                this.closeClaimConfirmationModal();
+                this.switchSection('found');
+                
+                // Show success message after redirect
+                setTimeout(() => {
+                    this.showSuccessMessage(`Claim submitted successfully for "${item.name}"! We will contact you to verify ownership.`);
+                }, 100);
+            } else {
+                let errorMessage = 'Failed to submit claim';
+                try {
+                    const errorData = await response.json();
+                    errorMessage = errorData.message || errorMessage;
+                } catch (e) {
+                    console.error('Failed to parse error response:', e);
+                    errorMessage = `Server error (${response.status}): ${response.statusText}`;
+                }
+                this.showErrorMessage(errorMessage);
+            }
+        } catch (error) {
+            console.error('Claim submission error:', error);
+            this.showErrorMessage('Failed to submit claim. Please try again.');
+        } finally {
+            this.isSubmittingClaim = false;
+        }
+    }
 
     goToClaimPage(itemId) {
         const item = this.foundItems.find(item => item.id === itemId);
@@ -1207,18 +1557,7 @@ class LostAndFoundApp {
         // Set current date
         document.getElementById('claim-page-date').value = new Date().toISOString().split('T')[0];
 
-        // Ensure the claim form event listener is attached
-        const claimForm = document.getElementById('claim-item-page-form');
-        if (claimForm && !claimForm.hasAttribute('data-listener-attached')) {
-            claimForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                if (this.isSubmitting) return;
-                this.isSubmitting = true;
-                this.handleItemClaimPageSubmit(e.target);
-                setTimeout(() => { this.isSubmitting = false; }, 2000);
-            });
-            claimForm.setAttribute('data-listener-attached', 'true');
-        }
+        // Event listener is already attached in setupMainAppListeners()
 
         // Switch to claim page
         this.switchSection('claim-item');
@@ -1238,72 +1577,24 @@ class LostAndFoundApp {
         const existingClaim = this.claims.find(claim => 
             claim.itemId === itemId && 
             claim.claimedBy === this.currentUser.id && 
-            claim.status === 'pending'
+            (claim.status === 'pending' || claim.status === 0 || claim.status === 'Pending')
         );
 
         if (existingClaim) {
             this.showErrorMessage('You have already submitted a claim for this item. Please wait for admin review.');
+            // Redirect back to found items after showing error
+            setTimeout(() => {
+                this.switchSection('found');
+            }, 2000);
             return;
         }
 
-        // Show confirmation dialog
+        // Show confirmation modal
         const claimerName = formData.get('claimerName');
         const claimerEmail = formData.get('claimerEmail');
         const ownershipDetails = formData.get('ownershipDetails');
         
-        const confirmMessage = `Are you sure you want to submit a claim for "${item.name}"?\n\n` +
-            `Your Details:\n` +
-            `Name: ${claimerName}\n` +
-            `Email: ${claimerEmail}\n` +
-            `Ownership Details: ${ownershipDetails}\n\n` +
-            `Once submitted, an administrator will review your claim and contact you if approved.`;
-        
-        if (!confirm(confirmMessage)) {
-            return; // User cancelled
-        }
-
-        const claim = {
-            itemId: itemId,
-            claimerName: claimerName,
-            claimerEmail: claimerEmail,
-            lastSeenBuilding: formData.get('lastSeenBuilding'),
-            lastSeenRoom: formData.get('lastSeenRoom'),
-            ownershipDetails: ownershipDetails,
-            claimDate: formData.get('claimDate') || new Date().toISOString().split('T')[0],
-            claimedBy: this.currentUser.id,
-            status: 'pending'
-        };
-
-        try {
-            const response = await fetch(`${this.apiBaseUrl}/claims`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(claim)
-            });
-
-            if (response.ok) {
-                const newClaim = await response.json();
-                this.claims.push(newClaim);
-                this.showSuccessMessage(`Claim submitted successfully for "${item.name}"! We will contact you to verify ownership.`);
-                form.reset();
-                this.switchSection('found');
-            } else {
-                let errorMessage = 'Failed to submit claim';
-                try {
-                    const errorData = await response.json();
-                    errorMessage = errorData.message || errorMessage;
-                } catch (e) {
-                    console.error('Failed to parse error response:', e);
-                    errorMessage = `Server error (${response.status}): ${response.statusText}`;
-                }
-                this.showErrorMessage(errorMessage);
-            }
-        } catch (error) {
-            console.error('Claim submission error:', error);
-            this.showErrorMessage('Failed to submit claim. Please try again.');
-        }
+        this.showClaimConfirmationModal(item, claimerName, claimerEmail, ownershipDetails, formData);
     }
 
     renderArchive() {
@@ -1334,10 +1625,11 @@ class LostAndFoundApp {
         const date = new Date(claim.dateSubmitted).toLocaleDateString();
         const roomText = claim.lastSeenRoom ? `, Room ${claim.lastSeenRoom}` : '';
         
-        // Get item details from the related item or use fallback values
-        const itemName = claim.item?.name || 'Unknown Item';
-        const itemBuilding = claim.item?.building || 'Unknown Building';
-        const itemRoom = claim.item?.room || '';
+        // Get item details by looking up the itemId in foundItems
+        const item = this.foundItems.find(item => item.id === claim.itemId);
+        const itemName = item?.name || 'Unknown Item';
+        const itemBuilding = item?.building || 'Unknown Building';
+        const itemRoom = item?.room || '';
         const itemRoomText = itemRoom ? `, Room ${itemRoom}` : '';
         
         let statusClass, statusIcon, statusText;
@@ -1375,7 +1667,7 @@ class LostAndFoundApp {
                 <div class="claim-details expandable-content" id="expandable-${claim.id}" style="display: none;">
                     <div class="claim-details-section">
                         <h5><i class="fas fa-info-circle"></i> Item Details</h5>
-                        <p><strong>Description:</strong> ${this.escapeHtml(claim.item?.description || 'No description available')}</p>
+                        <p><strong>Description:</strong> ${this.escapeHtml(item?.description || 'No description available')}</p>
                     </div>
                     
                     <div class="claim-details-section">
@@ -1568,6 +1860,23 @@ function refreshClaims() {
         window.app.refreshClaims();
     } else {
         console.error('window.app not found!');
+    }
+}
+
+function toggleOwnershipDetails() {
+    const ownershipContent = document.getElementById('ownership-details-content');
+    const ownershipChevron = document.getElementById('ownership-chevron');
+    
+    if (ownershipContent && ownershipChevron) {
+        if (ownershipContent.style.display === 'none') {
+            ownershipContent.style.display = 'block';
+            ownershipChevron.classList.remove('fa-chevron-down');
+            ownershipChevron.classList.add('fa-chevron-up');
+        } else {
+            ownershipContent.style.display = 'none';
+            ownershipChevron.classList.remove('fa-chevron-up');
+            ownershipChevron.classList.add('fa-chevron-down');
+        }
     }
 }
 

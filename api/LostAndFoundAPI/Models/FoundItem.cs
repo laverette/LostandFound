@@ -32,6 +32,7 @@ namespace LostAndFoundAPI.Models
         
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+        public bool IsVisible { get; set; } = true;
 
         // Navigation properties
         public ICollection<Claim> Claims { get; set; } = new List<Claim>();

@@ -14,6 +14,22 @@
             <div class="landing-header">
                 <h1><i class="fas fa-search"></i>Crimson Lost & Found</h1>
                 <p class="landing-subtitle">Helping Crimson Tide students find their lost items</p>
+                
+                <!-- Quick Stats -->
+                <div class="quick-stats">
+                    <div class="stat-item">
+                        <div class="stat-number">47</div>
+                        <div class="stat-label">Items Found This Month</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">23</div>
+                        <div class="stat-label">Students Helped</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">5</div>
+                        <div class="stat-label">Campus Buildings</div>
+                    </div>
+                </div>
             </div>
             
             <div class="auth-buttons">
@@ -111,6 +127,9 @@
             <div class="auth-header">
                 <h2><i class="fas fa-user-shield"></i>Admin Login</h2>
                 <p>Administrator access to manage lost and found items</p>
+                <div class="testing-note">
+                    <strong>For Testing:</strong> Password is <code>1234</code>
+                </div>
             </div>
             
             <form id="admin-login-form" class="auth-form">
@@ -461,6 +480,160 @@
                     <button type="submit" class="btn-primary">Submit Claim</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Admin Resolve Claim Modal -->
+    <div id="resolve-claim-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-check-circle"></i> Resolve Claim</h3>
+            </div>
+            <div class="modal-body">
+                <p id="resolve-claim-message">Are you sure you want to resolve this claim?</p>
+                <div class="resolve-options">
+                    <p><strong>Choose an option:</strong></p>
+                    <div class="resolve-option">
+                        <i class="fas fa-check-circle text-success"></i>
+                        <span><strong>Item was claimed successfully</strong> - Remove from listings</span>
+                    </div>
+                    <div class="resolve-option">
+                        <i class="fas fa-times-circle text-warning"></i>
+                        <span><strong>Item was NOT the right item</strong> - Keep item visible</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-success" id="resolve-success-btn">
+                    <i class="fas fa-check"></i> Item Claimed Successfully
+                </button>
+                <button type="button" class="btn-warning" id="resolve-keep-btn">
+                    <i class="fas fa-eye"></i> Keep Item Visible
+                </button>
+                <button type="button" class="btn-secondary" id="resolve-cancel-btn">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Student Claim Confirmation Modal -->
+    <div id="claim-confirmation-modal" class="modal">
+        <div class="modal-content claim-confirmation-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-ticket-alt"></i> Confirm Claim Submission</h3>
+            </div>
+            <div class="modal-body">
+                <!-- Item Summary -->
+                <div class="item-summary">
+                    <h4><i class="fas fa-box"></i> Item You're Claiming</h4>
+                    <div class="item-summary-card">
+                        <h5 id="claim-confirmation-item-name"></h5>
+                        <p><strong>Location:</strong> <span id="claim-confirmation-item-location"></span></p>
+                        <p><strong>Date Found:</strong> <span id="claim-confirmation-item-date"></span></p>
+                    </div>
+                </div>
+
+                <!-- Your Information -->
+                <div class="claimant-info">
+                    <h4><i class="fas fa-user"></i> Your Information</h4>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <strong>Name:</strong> <span id="claim-confirmation-name"></span>
+                        </div>
+                        <div class="info-item">
+                            <strong>Email:</strong> <span id="claim-confirmation-email"></span>
+                        </div>
+                        <div class="info-item">
+                            <strong>Last Seen:</strong> <span id="claim-confirmation-last-seen"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ownership Details (Collapsible) -->
+                <div class="ownership-section">
+                    <div class="ownership-header" onclick="toggleOwnershipDetails()">
+                        <h4><i class="fas fa-key"></i> Ownership Details</h4>
+                        <i class="fas fa-chevron-down" id="ownership-chevron"></i>
+                    </div>
+                    <div class="ownership-content" id="ownership-details-content">
+                        <p id="claim-confirmation-ownership"></p>
+                    </div>
+                </div>
+
+                <!-- Process Notice -->
+                <div class="claim-notice">
+                    <i class="fas fa-info-circle"></i>
+                    <div>
+                        <strong>What happens next?</strong>
+                        <p>An administrator will review your claim and contact you via email if your ownership can be verified. This usually takes 1-2 business days.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-secondary" id="claim-cancel-btn">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+                <button type="button" class="btn-success" id="claim-confirm-btn">
+                    <i class="fas fa-paper-plane"></i> Submit Claim
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-confirmation-modal" class="modal">
+        <div class="modal-content delete-confirmation-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-exclamation-triangle text-danger"></i> Confirm Permanent Deletion</h3>
+            </div>
+            <div class="modal-body">
+                <!-- Warning Message -->
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>This action cannot be undone!</strong>
+                </div>
+
+                <!-- Item Details -->
+                <div class="item-summary">
+                    <h4><i class="fas fa-box"></i> Item to be deleted:</h4>
+                    <div class="item-summary-card">
+                        <h5 id="delete-confirmation-item-name"></h5>
+                        <p><strong>Location:</strong> <span id="delete-confirmation-item-location"></span></p>
+                        <p><strong>Date Found:</strong> <span id="delete-confirmation-item-date"></span></p>
+                        <p><strong>Associated Claims:</strong> <span id="delete-confirmation-claim-count"></span></p>
+                    </div>
+                </div>
+
+                <!-- Confirmation Input -->
+                <div class="confirmation-input">
+                    <label for="delete-confirmation-text">
+                        <i class="fas fa-keyboard"></i> Type <strong>DELETE</strong> to confirm:
+                    </label>
+                    <input type="text" id="delete-confirmation-text" placeholder="Type DELETE here" autocomplete="off">
+                </div>
+
+                <!-- Warning Details -->
+                <div class="delete-warning">
+                    <i class="fas fa-info-circle"></i>
+                    <div>
+                        <strong>What will be deleted:</strong>
+                        <ul>
+                            <li>The found item and all its details</li>
+                            <li>All associated claims (pending and resolved)</li>
+                            <li>All ownership information and contact details</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-secondary" id="delete-cancel-btn">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+                <button type="button" class="btn-danger" id="delete-confirm-btn" disabled>
+                    <i class="fas fa-trash"></i> Delete Forever
+                </button>
+            </div>
         </div>
     </div>
 

@@ -18,29 +18,60 @@ namespace LostAndFoundAPI.Controllers
 
         // GET: api/claims
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Claim>>> GetClaims()
+        public async Task<ActionResult<IEnumerable<ClaimDto>>> GetClaims()
         {
             try
             {
                 Console.WriteLine("Getting claims...");
                 
-                // First try without includes to see if that's the issue
                 var claims = await _context.Claims
+                    .Where(c => c.DeletedAt == null)
                     .OrderByDescending(c => c.DateSubmitted)
                     .ToListAsync();
                 
                 Console.WriteLine($"Found {claims.Count} claims");
                 
-                // Now try to load the related items separately
-                foreach (var claim in claims)
+                // Debug: Check what items exist
+                var allItems = await _context.FoundItems.ToListAsync();
+                Console.WriteLine($"Total items in database: {allItems.Count}");
+                foreach (var item in allItems)
                 {
-                    if (!string.IsNullOrEmpty(claim.ItemId))
-                    {
-                        claim.Item = await _context.FoundItems.FindAsync(claim.ItemId);
-                    }
+                    Console.WriteLine($"Item: {item.Id} - {item.Name}");
                 }
                 
-                return claims;
+                var claimDtos = new List<ClaimDto>();
+                
+                foreach (var claim in claims)
+                {
+                    Console.WriteLine($"Looking for item with ID: {claim.ItemId}");
+                    var item = await _context.FoundItems.FindAsync(claim.ItemId);
+                    Console.WriteLine($"Found item: {item?.Name ?? "NULL"}");
+                    
+                    claimDtos.Add(new ClaimDto
+                    {
+                        Id = claim.Id,
+                        ItemId = claim.ItemId,
+                        ItemName = item?.Name ?? "Unknown Item",
+                        ItemDescription = item?.Description ?? "",
+                        ItemBuilding = item?.Building ?? "",
+                        ItemRoom = item?.Room,
+                        ClaimerName = claim.ClaimerName,
+                        ClaimerEmail = claim.ClaimerEmail,
+                        LastSeenBuilding = claim.LastSeenBuilding,
+                        LastSeenRoom = claim.LastSeenRoom,
+                        OwnershipDetails = claim.OwnershipDetails,
+                        ClaimDate = claim.ClaimDate,
+                        DateSubmitted = claim.DateSubmitted,
+                        ClaimedBy = claim.ClaimedBy,
+                        Status = claim.Status,
+                        ResolvedDate = claim.ResolvedDate,
+                        ResolvedBy = claim.ResolvedBy,
+                        CreatedAt = claim.CreatedAt,
+                        UpdatedAt = claim.UpdatedAt
+                    });
+                }
+                
+                return claimDtos;
             }
             catch (Exception ex)
             {
@@ -52,28 +83,51 @@ namespace LostAndFoundAPI.Controllers
 
         // GET: api/claims/pending
         [HttpGet("pending")]
-        public async Task<ActionResult<IEnumerable<Claim>>> GetPendingClaims()
+        public async Task<ActionResult<IEnumerable<ClaimDto>>> GetPendingClaims()
         {
             try
             {
                 Console.WriteLine("Getting pending claims...");
                 var claims = await _context.Claims
-                    .Where(c => c.Status == ClaimStatus.Pending)
+                    .Where(c => c.Status == ClaimStatus.Pending && c.DeletedAt == null)
                     .OrderByDescending(c => c.DateSubmitted)
                     .ToListAsync();
                 
                 Console.WriteLine($"Found {claims.Count} pending claims");
                 
-                // Load related items separately
+                var claimDtos = new List<ClaimDto>();
+                
                 foreach (var claim in claims)
                 {
-                    if (!string.IsNullOrEmpty(claim.ItemId))
+                    Console.WriteLine($"Looking for item with ID: {claim.ItemId}");
+                    var item = await _context.FoundItems.FindAsync(claim.ItemId);
+                    Console.WriteLine($"Found item: {item?.Name ?? "NULL"}");
+                    
+                    claimDtos.Add(new ClaimDto
                     {
-                        claim.Item = await _context.FoundItems.FindAsync(claim.ItemId);
-                    }
+                        Id = claim.Id,
+                        ItemId = claim.ItemId,
+                        ItemName = item?.Name ?? "Unknown Item",
+                        ItemDescription = item?.Description ?? "",
+                        ItemBuilding = item?.Building ?? "",
+                        ItemRoom = item?.Room,
+                        ClaimerName = claim.ClaimerName,
+                        ClaimerEmail = claim.ClaimerEmail,
+                        LastSeenBuilding = claim.LastSeenBuilding,
+                        LastSeenRoom = claim.LastSeenRoom,
+                        OwnershipDetails = claim.OwnershipDetails,
+                        ClaimDate = claim.ClaimDate,
+                        DateSubmitted = claim.DateSubmitted,
+                        ClaimedBy = claim.ClaimedBy,
+                        Status = claim.Status,
+                        ResolvedDate = claim.ResolvedDate,
+                        ResolvedBy = claim.ResolvedBy,
+                        CreatedAt = claim.CreatedAt,
+                        UpdatedAt = claim.UpdatedAt
+                    });
                 }
                 
-                return claims;
+                return claimDtos;
             }
             catch (Exception ex)
             {
@@ -85,7 +139,7 @@ namespace LostAndFoundAPI.Controllers
 
         // GET: api/claims/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Claim>> GetClaim(string id)
+        public async Task<ActionResult<ClaimDto>> GetClaim(string id)
         {
             var claim = await _context.Claims
                 .Include(c => c.Item)
@@ -98,12 +152,35 @@ namespace LostAndFoundAPI.Controllers
                 return NotFound();
             }
 
-            return claim;
+            var claimDto = new ClaimDto
+            {
+                Id = claim.Id,
+                ItemId = claim.ItemId,
+                ItemName = claim.Item?.Name ?? "Unknown Item",
+                ItemDescription = claim.Item?.Description ?? "",
+                ItemBuilding = claim.Item?.Building ?? "",
+                ItemRoom = claim.Item?.Room,
+                ClaimerName = claim.ClaimerName,
+                ClaimerEmail = claim.ClaimerEmail,
+                LastSeenBuilding = claim.LastSeenBuilding,
+                LastSeenRoom = claim.LastSeenRoom,
+                OwnershipDetails = claim.OwnershipDetails,
+                ClaimDate = claim.ClaimDate,
+                DateSubmitted = claim.DateSubmitted,
+                ClaimedBy = claim.ClaimedBy,
+                Status = claim.Status,
+                ResolvedDate = claim.ResolvedDate,
+                ResolvedBy = claim.ResolvedBy,
+                CreatedAt = claim.CreatedAt,
+                UpdatedAt = claim.UpdatedAt
+            };
+
+            return claimDto;
         }
 
         // POST: api/claims
         [HttpPost]
-        public async Task<ActionResult<Claim>> PostClaim(CreateClaimRequest request)
+        public async Task<ActionResult<ClaimDto>> PostClaim(CreateClaimRequest request)
         {
             // Verify the item exists
             var item = await _context.FoundItems.FindAsync(request.ItemId);
@@ -135,8 +212,31 @@ namespace LostAndFoundAPI.Controllers
             _context.Claims.Add(claim);
             await _context.SaveChangesAsync();
 
-            // Return the claim with related data
-            return CreatedAtAction("GetClaim", new { id = claim.Id }, await GetClaimWithIncludes(claim.Id));
+            // Return a DTO to avoid circular reference
+            var claimDto = new ClaimDto
+            {
+                Id = claim.Id,
+                ItemId = claim.ItemId,
+                ItemName = item.Name,
+                ItemDescription = item.Description,
+                ItemBuilding = item.Building,
+                ItemRoom = item.Room,
+                ClaimerName = claim.ClaimerName,
+                ClaimerEmail = claim.ClaimerEmail,
+                LastSeenBuilding = claim.LastSeenBuilding,
+                LastSeenRoom = claim.LastSeenRoom,
+                OwnershipDetails = claim.OwnershipDetails,
+                ClaimDate = claim.ClaimDate,
+                DateSubmitted = claim.DateSubmitted,
+                ClaimedBy = claim.ClaimedBy,
+                Status = claim.Status,
+                ResolvedDate = claim.ResolvedDate,
+                ResolvedBy = claim.ResolvedBy,
+                CreatedAt = claim.CreatedAt,
+                UpdatedAt = claim.UpdatedAt
+            };
+
+            return CreatedAtAction("GetClaim", new { id = claim.Id }, claimDto);
         }
 
         // PUT: api/claims/5/resolve
