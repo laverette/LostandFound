@@ -137,6 +137,8 @@ class LostAndFoundApp {
     }
 
     checkAuthentication() {
+        console.log('=== AUTHENTICATION CHECK STARTED ===');
+        
         // Check if user is already logged in
         const savedUser = localStorage.getItem('currentUser');
         const savedUserType = localStorage.getItem('userType');
@@ -146,13 +148,26 @@ class LostAndFoundApp {
         console.log('Saved user type:', savedUserType);
         
         if (savedUser && savedUserType) {
-            this.currentUser = JSON.parse(savedUser);
-            this.userType = savedUserType;
-            console.log('Loaded user from localStorage:', this.currentUser);
-            this.showMainApp();
+            try {
+                this.currentUser = JSON.parse(savedUser);
+                this.userType = savedUserType;
+                console.log('Loaded user from localStorage:', this.currentUser);
+                console.log('User type:', this.userType);
+                console.log('Switching to main app...');
+                this.showMainApp();
+                console.log('=== AUTHENTICATION CHECK: USER LOGGED IN ===');
+            } catch (error) {
+                console.error('Error parsing saved user data:', error);
+                console.log('Clearing corrupted user data...');
+                localStorage.removeItem('currentUser');
+                localStorage.removeItem('userType');
+                this.showLandingPage();
+                console.log('=== AUTHENTICATION CHECK: CORRUPTED DATA CLEARED ===');
+            }
         } else {
             console.log('No saved user, showing landing page');
             this.showLandingPage();
+            console.log('=== AUTHENTICATION CHECK: NO SAVED USER ===');
         }
     }
 
@@ -412,16 +427,70 @@ class LostAndFoundApp {
     showStudentLogin() {
         this.hideAllPages();
         document.getElementById('student-login-page').style.display = 'block';
+        
+        // Clear forms and messages when switching to login page
+        this.clearLoginForms();
+        this.clearMessages();
+        
+        // Focus on email field for better UX
+        setTimeout(() => {
+            const emailField = document.getElementById('student-email');
+            if (emailField) emailField.focus();
+        }, 100);
     }
 
     showStudentRegister() {
         this.hideAllPages();
         document.getElementById('student-register-page').style.display = 'block';
+        
+        // Clear forms and messages when switching to register page
+        this.clearLoginForms();
+        this.clearMessages();
+        
+        // Focus on name field for better UX
+        setTimeout(() => {
+            const nameField = document.getElementById('register-name');
+            if (nameField) nameField.focus();
+        }, 100);
     }
 
     showAdminLogin() {
         this.hideAllPages();
         document.getElementById('admin-login-page').style.display = 'block';
+        
+        // Clear forms and messages when switching to admin login page
+        this.clearLoginForms();
+        this.clearMessages();
+        
+        // Focus on password field for better UX
+        setTimeout(() => {
+            const passwordField = document.getElementById('admin-password');
+            if (passwordField) passwordField.focus();
+        }, 100);
+    }
+
+    clearLoginForms() {
+        console.log('Clearing login forms...');
+        
+        // Clear student login form
+        const studentLoginForm = document.getElementById('student-login-form');
+        if (studentLoginForm) {
+            studentLoginForm.reset();
+        }
+        
+        // Clear student register form
+        const studentRegisterForm = document.getElementById('student-register-form');
+        if (studentRegisterForm) {
+            studentRegisterForm.reset();
+        }
+        
+        // Clear admin login form
+        const adminLoginForm = document.getElementById('admin-login-form');
+        if (adminLoginForm) {
+            adminLoginForm.reset();
+        }
+        
+        console.log('Login forms cleared');
     }
 
     showMainApp() {
@@ -438,7 +507,9 @@ class LostAndFoundApp {
         if (this.userType === 'student') {
             // Students see: Found Items only
             nav.innerHTML = `
-                <button class="nav-btn active" data-section="found">Found Items</button>
+                <button class="nav-btn active" data-section="found">
+                    <i class="fas fa-box"></i> Found Items
+                </button>
                 <button class="logout-btn" onclick="logout()">
                     <i class="fas fa-sign-out-alt"></i> Logout
                 </button>
@@ -447,9 +518,15 @@ class LostAndFoundApp {
             // Admins see: Found Items, Add Found Item, Claims Management
             // Archive tab commented out - functionality still exists
             nav.innerHTML = `
-                <button class="nav-btn active" data-section="found">Found Items</button>
-                <button class="nav-btn" data-section="missing">Add Found Item</button>
-                <button class="nav-btn" data-section="claims-management">Claims</button>
+                <button class="nav-btn active" data-section="found">
+                    <i class="fas fa-box"></i> Found Items
+                </button>
+                <button class="nav-btn" data-section="missing">
+                    <i class="fas fa-plus-circle"></i> Add Found Item
+                </button>
+                <button class="nav-btn" data-section="claims-management">
+                    <i class="fas fa-clipboard-list"></i> Manage Claims
+                </button>
                 <!-- <button class="nav-btn" data-section="archive">Archive</button> -->
                 <button class="logout-btn" onclick="logout()">
                     <i class="fas fa-sign-out-alt"></i> Logout
@@ -470,11 +547,24 @@ class LostAndFoundApp {
     }
 
     async handleStudentLogin(form) {
+        console.log('=== STUDENT LOGIN ATTEMPT STARTED ===');
+        
         const formData = new FormData(form);
         const email = formData.get('email');
         const password = formData.get('password');
 
+        console.log('Login attempt for email:', email);
+        console.log('API Base URL:', this.apiBaseUrl);
+
+        // Validate input
+        if (!email || !password) {
+            console.error('Missing email or password');
+            this.showErrorMessage('Please enter both email and password.');
+            return;
+        }
+
         try {
+            console.log('Sending login request to API...');
             const response = await fetch(`${this.apiBaseUrl}/users/login`, {
                 method: 'POST',
                 headers: {
@@ -483,8 +573,13 @@ class LostAndFoundApp {
                 body: JSON.stringify({ email, password })
             });
 
+            console.log('API Response Status:', response.status);
+            console.log('API Response OK:', response.ok);
+
             if (response.ok) {
                 const userData = await response.json();
+                console.log('Login successful, user data:', userData);
+                
                 this.currentUser = {
                     id: userData.id,
                     name: userData.name,
@@ -492,22 +587,42 @@ class LostAndFoundApp {
                 };
                 this.userType = 'student';
                 this.saveCurrentUser();
+                
+                console.log('User saved to localStorage');
+                console.log('Switching to main app...');
+                
                 this.showMainApp();
                 this.showSuccessMessage('Welcome back, ' + userData.name + '!');
+                
+                console.log('=== STUDENT LOGIN SUCCESSFUL ===');
             } else {
+                console.error('Login failed with status:', response.status);
                 let errorMessage = 'Invalid email or password';
                 try {
                     const errorData = await response.json();
+                    console.error('API Error Response:', errorData);
                     errorMessage = errorData.message || errorMessage;
                 } catch (e) {
                     console.error('Failed to parse error response:', e);
                     errorMessage = `Server error (${response.status}): ${response.statusText}`;
                 }
                 this.showErrorMessage(errorMessage);
+                console.log('=== STUDENT LOGIN FAILED ===');
             }
         } catch (error) {
-            console.error('Login error:', error);
-            this.showErrorMessage('Login failed. Please try again.');
+            console.error('Network or other error during login:', error);
+            console.error('Error details:', {
+                name: error.name,
+                message: error.message,
+                stack: error.stack
+            });
+            
+            if (error.name === 'TypeError' && error.message.includes('fetch')) {
+                this.showErrorMessage('Cannot connect to server. Please check if the API is running on ' + this.apiBaseUrl);
+            } else {
+                this.showErrorMessage('Login failed. Please try again.');
+            }
+            console.log('=== STUDENT LOGIN ERROR ===');
         }
     }
 
@@ -560,10 +675,23 @@ class LostAndFoundApp {
     }
 
     async handleAdminLogin(form) {
+        console.log('=== ADMIN LOGIN ATTEMPT STARTED ===');
+        
         const formData = new FormData(form);
         const password = formData.get('password');
 
+        console.log('Admin login attempt');
+        console.log('API Base URL:', this.apiBaseUrl);
+
+        // Validate input
+        if (!password) {
+            console.error('Missing admin password');
+            this.showErrorMessage('Please enter the admin password.');
+            return;
+        }
+
         try {
+            console.log('Sending admin login request to API...');
             const response = await fetch(`${this.apiBaseUrl}/users/admin-login`, {
                 method: 'POST',
                 headers: {
@@ -572,9 +700,13 @@ class LostAndFoundApp {
                 body: JSON.stringify({ password })
             });
 
+            console.log('Admin API Response Status:', response.status);
+            console.log('Admin API Response OK:', response.ok);
+
             if (response.ok) {
                 const userData = await response.json();
-                console.log('Admin login response:', userData);
+                console.log('Admin login successful, user data:', userData);
+                
                 this.currentUser = {
                     id: userData.id,
                     name: userData.name,
@@ -583,24 +715,103 @@ class LostAndFoundApp {
                 console.log('Admin user object:', this.currentUser);
                 this.userType = 'admin';
                 this.saveCurrentUser();
+                
+                console.log('Admin user saved to localStorage');
+                console.log('Switching to main app...');
+                
                 this.showMainApp();
                 this.showSuccessMessage('Welcome, Administrator!');
+                
+                console.log('=== ADMIN LOGIN SUCCESSFUL ===');
             } else {
-                const errorData = await response.json();
-                this.showErrorMessage(errorData.message || 'Invalid admin password');
+                console.error('Admin login failed with status:', response.status);
+                let errorMessage = 'Invalid admin password';
+                try {
+                    const errorData = await response.json();
+                    console.error('Admin API Error Response:', errorData);
+                    errorMessage = errorData.message || errorMessage;
+                } catch (e) {
+                    console.error('Failed to parse admin error response:', e);
+                    errorMessage = `Server error (${response.status}): ${response.statusText}`;
+                }
+                this.showErrorMessage(errorMessage);
+                console.log('=== ADMIN LOGIN FAILED ===');
             }
         } catch (error) {
-            console.error('Admin login error:', error);
-            this.showErrorMessage('Admin login failed. Please try again.');
+            console.error('Network or other error during admin login:', error);
+            console.error('Admin login error details:', {
+                name: error.name,
+                message: error.message,
+                stack: error.stack
+            });
+            
+            if (error.name === 'TypeError' && error.message.includes('fetch')) {
+                this.showErrorMessage('Cannot connect to server. Please check if the API is running on ' + this.apiBaseUrl);
+            } else {
+                this.showErrorMessage('Admin login failed. Please try again.');
+            }
+            console.log('=== ADMIN LOGIN ERROR ===');
         }
     }
 
     logout() {
+        console.log('=== LOGOUT PROCESS STARTED ===');
+        
+        // Clear user data
         this.currentUser = null;
         this.userType = null;
         localStorage.removeItem('currentUser');
         localStorage.removeItem('userType');
+        
+        // Clear all form data
+        this.clearAllForms();
+        
+        // Clear any error/success messages
+        this.clearMessages();
+        
+        console.log('=== LOGOUT PROCESS COMPLETED ===');
         this.showLandingPage();
+    }
+
+    clearAllForms() {
+        console.log('Clearing all forms...');
+        
+        // Clear student login form
+        const studentLoginForm = document.getElementById('student-login-form');
+        if (studentLoginForm) {
+            studentLoginForm.reset();
+            console.log('Student login form cleared');
+        }
+        
+        // Clear student register form
+        const studentRegisterForm = document.getElementById('student-register-form');
+        if (studentRegisterForm) {
+            studentRegisterForm.reset();
+            console.log('Student register form cleared');
+        }
+        
+        // Clear admin login form
+        const adminLoginForm = document.getElementById('admin-login-form');
+        if (adminLoginForm) {
+            adminLoginForm.reset();
+            console.log('Admin login form cleared');
+        }
+        
+        // Clear any other forms that might have data
+        const allForms = document.querySelectorAll('form');
+        allForms.forEach(form => {
+            if (form.id && !form.id.includes('claim') && !form.id.includes('missing')) {
+                form.reset();
+            }
+        });
+        
+        console.log('All forms cleared');
+    }
+
+    clearMessages() {
+        // Remove any existing success/error messages
+        const existingMessages = document.querySelectorAll('.success-message, .error-message');
+        existingMessages.forEach(message => message.remove());
     }
 
     saveCurrentUser() {
