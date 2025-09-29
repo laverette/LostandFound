@@ -1,0 +1,13 @@
+{
+  "name": "lost-and-found-app",
+  "version": "1.0.0",
+  "description": "Alabama Lost & Found Application",
+  "scripts": {
+    "build": "echo 'Frontend build completed'",
+    "start": "echo 'Starting application'"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  }
+}

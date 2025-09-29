@@ -1,0 +1,21 @@
+[phases.setup]
+nixPkgs = ["dotnet-sdk_8", "nodejs", "npm"]
+
+[phases.install]
+cmds = [
+    "cd api/LostAndFoundAPI && dotnet restore",
+    "cd frontend && npm install"
+]
+
+[phases.build]
+cmds = [
+    "cd api/LostAndFoundAPI && dotnet publish -c Release -o ./publish",
+    "cd frontend && npm run build"
+]
+
+[start]
+cmd = "cd api/LostAndFoundAPI && dotnet ./publish/LostAndFoundAPI.dll --urls=http://0.0.0.0:$PORT"
+
+[variables]
+ASPNETCORE_ENVIRONMENT = "Production"
+ASPNETCORE_URLS = "http://0.0.0.0:$PORT"

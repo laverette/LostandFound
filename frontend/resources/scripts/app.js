@@ -9,7 +9,10 @@ class LostAndFoundApp {
         this.students = [];
         this.currentFilter = '';
         this.currentSearch = '';
-        this.apiBaseUrl = 'http://localhost:5141/api'; // API base URL
+        // Use relative URL for production, absolute for development
+        this.apiBaseUrl = window.location.hostname === 'localhost' 
+            ? 'http://localhost:5141/api' 
+            : '/api';
         
         this.init();
     }
