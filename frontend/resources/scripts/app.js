@@ -9,7 +9,7 @@ class LostAndFoundApp {
         this.students = [];
         this.currentFilter = '';
         this.currentSearch = '';
-        this.apiBaseUrl = 'http://localhost:5141/api'; // API base URL
+        this.apiBaseUrl = 'https://apibackend-production-c04f.up.railway.app/api'; // API base URL
         
         this.init();
     }
