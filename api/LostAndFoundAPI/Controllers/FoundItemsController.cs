@@ -133,22 +133,7 @@ namespace LostAndFoundAPI.Controllers
             return NoContent();
         }
 
-        // PUT: api/founditems/5/hide
-        [HttpPut("{id}/hide")]
-        public async Task<IActionResult> HideFoundItem(string id)
-        {
-            var foundItem = await _context.FoundItems.FindAsync(id);
-            if (foundItem == null)
-            {
-                return NotFound();
-            }
 
-            foundItem.IsVisible = false;
-            foundItem.UpdatedAt = DateTime.UtcNow;
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
 
         private bool FoundItemExists(string id)
         {

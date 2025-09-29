@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\timen\\OneDrive - The University of Alabama\\Classes\\mis321\\Project1\\LostandFound\\api\\LostAndFoundAPI\\LostAndFoundAPI.csproj": {}
+    "C:\\Schoolwork\\MIS321\\LostandFound\\api\\LostAndFoundAPI\\LostAndFoundAPI.csproj": {}
   },
   "projects": {
-    "C:\\Users\\timen\\OneDrive - The University of Alabama\\Classes\\mis321\\Project1\\LostandFound\\api\\LostAndFoundAPI\\LostAndFoundAPI.csproj": {
+    "C:\\Schoolwork\\MIS321\\LostandFound\\api\\LostAndFoundAPI\\LostAndFoundAPI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\timen\\OneDrive - The University of Alabama\\Classes\\mis321\\Project1\\LostandFound\\api\\LostAndFoundAPI\\LostAndFoundAPI.csproj",
+        "projectUniqueName": "C:\\Schoolwork\\MIS321\\LostandFound\\api\\LostAndFoundAPI\\LostAndFoundAPI.csproj",
         "projectName": "LostAndFoundAPI",
-        "projectPath": "C:\\Users\\timen\\OneDrive - The University of Alabama\\Classes\\mis321\\Project1\\LostandFound\\api\\LostAndFoundAPI\\LostAndFoundAPI.csproj",
-        "packagesPath": "C:\\Users\\timen\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\timen\\OneDrive - The University of Alabama\\Classes\\mis321\\Project1\\LostandFound\\api\\LostAndFoundAPI\\obj\\",
+        "projectPath": "C:\\Schoolwork\\MIS321\\LostandFound\\api\\LostAndFoundAPI\\LostAndFoundAPI.csproj",
+        "packagesPath": "C:\\Users\\logan\\.nuget\\packages\\",
+        "outputPath": "C:\\Schoolwork\\MIS321\\LostandFound\\api\\LostAndFoundAPI\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\timen\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\logan\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
