@@ -9,10 +9,7 @@ class LostAndFoundApp {
         this.students = [];
         this.currentFilter = '';
         this.currentSearch = '';
-        // Use relative URL for production, absolute for development
-        this.apiBaseUrl = window.location.hostname === 'localhost' 
-            ? 'http://localhost:5141/api' 
-            : '/api';
+        this.apiBaseUrl = 'http://localhost:5141/api'; // API base URL
         
         this.init();
     }
@@ -1961,55 +1958,6 @@ function logout() {
 function checkDataIntegrity() {
     if (window.app) {
         window.app.checkDataIntegrity();
-    }
-}
-
-function debugArchive() {
-    if (window.app) {
-        console.log('=== MANUAL ARCHIVE DEBUG ===');
-        console.log('Current user type:', window.app.userType);
-        console.log('All claims:', window.app.claims);
-        console.log('Claims with resolved status:', window.app.claims.filter(c => c.status === 'resolved'));
-        window.app.renderArchive();
-    }
-}
-
-function testResolveClaim() {
-    if (window.app && window.app.claims.length > 0) {
-        const firstClaim = window.app.claims[0];
-        console.log('Testing resolve claim for:', firstClaim);
-        window.app.resolveClaim(firstClaim.id);
-    } else {
-        console.log('No claims found to test with');
-    }
-}
-
-function createTestResolvedClaim() {
-    if (window.app) {
-        const testClaim = {
-            id: 'test-resolved-' + Date.now(),
-            itemId: 'test-item-1',
-            itemName: 'Test iPhone',
-            itemDescription: 'Black iPhone 12 Pro',
-            building: 'Bruno',
-            room: '201',
-            claimerName: 'Test Student',
-            claimerEmail: 'test@crimson.ua.edu',
-            lastSeenBuilding: 'Bruno',
-            lastSeenRoom: '201',
-            ownershipDetails: 'This is my phone because it has a specific scratch on the back',
-            claimDate: new Date().toISOString().split('T')[0],
-            dateSubmitted: new Date().toISOString(),
-            claimedBy: 'test-user',
-            status: 'resolved',
-            resolvedDate: new Date().toISOString(),
-            resolvedBy: 'admin-user'
-        };
-        
-        window.app.claims.push(testClaim);
-        window.app.saveClaims();
-        console.log('Created test resolved claim:', testClaim);
-        window.app.renderArchive();
     }
 }
 
