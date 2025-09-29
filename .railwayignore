@@ -23,5 +23,4 @@ api/LostAndFoundAPI/publish/
 !api/LostAndFoundAPI/
 !frontend/
 !nixpacks.toml
-!package.json
 !railway.json

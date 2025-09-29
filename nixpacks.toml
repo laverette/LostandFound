@@ -1,16 +1,14 @@
 [phases.setup]
-nixPkgs = ["dotnet-sdk_8", "nodejs", "npm"]
+nixPkgs = ["dotnet-sdk_8"]
 
 [phases.install]
 cmds = [
-    "cd api/LostAndFoundAPI && dotnet restore",
-    "cd frontend && npm install"
+    "cd api/LostAndFoundAPI && dotnet restore"
 ]
 
 [phases.build]
 cmds = [
-    "cd api/LostAndFoundAPI && dotnet publish -c Release -o ./publish",
-    "cd frontend && npm run build"
+    "cd api/LostAndFoundAPI && dotnet publish -c Release -o ./publish"
 ]
 
 [start]
