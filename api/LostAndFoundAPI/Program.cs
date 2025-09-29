@@ -42,6 +42,10 @@ if (app.Environment.IsProduction())
 app.UseHttpsRedirection();
 app.UseCors("AllowFrontend");
 app.UseAuthorization();
+
+// Add health check endpoint
+app.MapGet("/api/health", () => new { status = "healthy", timestamp = DateTime.UtcNow });
+
 app.MapControllers();
 
 // Fallback to serve the frontend for client-side routing
