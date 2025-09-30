@@ -499,6 +499,50 @@ class LostAndFoundApp {
         this.setupNavigationForUserType();
         this.renderFoundItems();
         this.setCurrentDate();
+        
+        // Reset to appropriate default section based on user type
+        this.switchToDefaultSection();
+    }
+    
+    switchToDefaultSection() {
+        if (this.userType === 'student') {
+            this.switchSection('found');
+        } else if (this.userType === 'admin') {
+            this.switchSection('found');
+        }
+    }
+    
+    async switchSection(sectionName) {
+        console.log('Switching to section:', sectionName);
+        
+        // Hide all sections
+        document.querySelectorAll('.section').forEach(section => {
+            section.classList.remove('active');
+        });
+        
+        // Remove active class from all nav buttons
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        
+        // Show the selected section
+        const targetSection = document.getElementById(sectionName + '-section');
+        if (targetSection) {
+            targetSection.classList.add('active');
+        }
+        
+        // Add active class to the corresponding nav button
+        const targetButton = document.querySelector(`[data-section="${sectionName}"]`);
+        if (targetButton) {
+            targetButton.classList.add('active');
+        }
+        
+        // Load section-specific data
+        if (sectionName === 'found') {
+            this.renderFoundItems();
+        } else if (sectionName === 'claims-management') {
+            this.loadClaims();
+        }
     }
 
     setupNavigationForUserType() {
@@ -768,6 +812,14 @@ class LostAndFoundApp {
         
         // Clear any error/success messages
         this.clearMessages();
+        
+        // Reset any active sections
+        document.querySelectorAll('.section').forEach(section => {
+            section.classList.remove('active');
+        });
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
         
         console.log('=== LOGOUT PROCESS COMPLETED ===');
         this.showLandingPage();
