@@ -20,6 +20,63 @@ body {
 /* Ensure single scrollbar for auth pages */
 body.auth-page-active {
     overflow-y: auto;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* Ensure body scrollbar is visible and styled properly */
+body.auth-page-active::-webkit-scrollbar {
+    width: 8px;
+    display: block;
+}
+
+body.auth-page-active::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+}
+
+body.auth-page-active::-webkit-scrollbar-thumb {
+    background: rgba(158, 27, 50, 0.6);
+    border-radius: 4px;
+}
+
+body.auth-page-active::-webkit-scrollbar-thumb:hover {
+    background: rgba(158, 27, 50, 0.8);
+}
+
+/* Hide scrollbars on all child elements except body */
+body.auth-page-active .auth-page,
+body.auth-page-active .auth-container,
+body.auth-page-active .auth-form,
+body.auth-page-active .auth-header,
+body.auth-page-active .auth-footer {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+    overflow: hidden !important;
+}
+
+body.auth-page-active .auth-page::-webkit-scrollbar,
+body.auth-page-active .auth-container::-webkit-scrollbar,
+body.auth-page-active .auth-form::-webkit-scrollbar,
+body.auth-page-active .auth-header::-webkit-scrollbar,
+body.auth-page-active .auth-footer::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+}
+
+/* Additional Chrome-specific fix - prevent any nested scrolling */
+body.auth-page-active * {
+    max-height: none !important;
+    overflow: visible !important;
+}
+
+body.auth-page-active .auth-page {
+    max-height: none !important;
+    overflow: hidden !important;
+}
+
+body.auth-page-active .auth-container {
+    max-height: none !important;
+    overflow: visible !important;
 }
 
 body::before {
