@@ -1355,30 +1355,41 @@ body::before {
     .nav-btn {
         flex: 1;
         min-width: 0;
-        padding: 0.6rem 0.4rem;
-        font-size: 0.75rem;
+        padding: 0.6rem 0.3rem;
+        font-size: 0.7rem;
         text-align: center;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        line-height: 1.2;
+        white-space: normal;
+        overflow: visible;
+        line-height: 1.1;
+        height: auto;
+        min-height: 2.5rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
     }
     
     .nav-btn i {
-        margin-right: 0.25rem;
-        font-size: 0.75rem;
+        margin-right: 0;
+        margin-bottom: 0.2rem;
+        font-size: 0.7rem;
     }
     
     .logout-btn {
         flex: 1;
         min-width: 0;
-        padding: 0.6rem 0.4rem;
-        font-size: 0.75rem;
+        padding: 0.6rem 0.3rem;
+        font-size: 0.7rem;
         text-align: center;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        line-height: 1.2;
+        white-space: normal;
+        overflow: visible;
+        line-height: 1.1;
+        height: auto;
+        min-height: 2.5rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
     }
 }
 
