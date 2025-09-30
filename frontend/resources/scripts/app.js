@@ -422,11 +422,13 @@ class LostAndFoundApp {
     showLandingPage() {
         this.hideAllPages();
         document.getElementById('landing-page').style.display = 'block';
+        document.body.classList.remove('auth-page-active');
     }
 
     showStudentLogin() {
         this.hideAllPages();
         document.getElementById('student-login-page').style.display = 'block';
+        document.body.classList.add('auth-page-active');
         
         // Clear forms and messages when switching to login page
         this.clearLoginForms();
@@ -442,6 +444,7 @@ class LostAndFoundApp {
     showStudentRegister() {
         this.hideAllPages();
         document.getElementById('student-register-page').style.display = 'block';
+        document.body.classList.add('auth-page-active');
         
         // Clear forms and messages when switching to register page
         this.clearLoginForms();
@@ -457,6 +460,7 @@ class LostAndFoundApp {
     showAdminLogin() {
         this.hideAllPages();
         document.getElementById('admin-login-page').style.display = 'block';
+        document.body.classList.add('auth-page-active');
         
         // Clear forms and messages when switching to admin login page
         this.clearLoginForms();
@@ -496,6 +500,7 @@ class LostAndFoundApp {
     showMainApp() {
         this.hideAllPages();
         document.getElementById('main-app').style.display = 'block';
+        document.body.classList.remove('auth-page-active');
         this.setupNavigationForUserType();
         this.renderFoundItems();
         this.setCurrentDate();

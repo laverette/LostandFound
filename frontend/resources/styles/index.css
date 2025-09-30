@@ -17,6 +17,11 @@ body {
     padding: 0;
 }
 
+/* Ensure single scrollbar for auth pages */
+body.auth-page-active {
+    overflow-y: auto;
+}
+
 body::before {
     content: '';
     position: fixed;
@@ -361,6 +366,7 @@ body::before {
     background: linear-gradient(135deg, #9E1B32, #C8102E);
     position: relative;
     padding: 1rem 0;
+    overflow: hidden;
 }
 
 .auth-page::before {
