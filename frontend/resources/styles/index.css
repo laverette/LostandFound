@@ -41,11 +41,11 @@ body::before {
 
 /* Landing Page Styles */
 .landing-page {
-    min-height: 100vh;
+    min-height: 120vh;
     display: block;
     background: linear-gradient(135deg, #9E1B32, #C8102E);
     position: relative;
-    overflow-y: auto;
+    overflow-y: scroll;
     padding: 2rem 0;
 }
 
@@ -1165,8 +1165,8 @@ body::before {
 /* Responsive Design */
 @media (max-width: 768px) {
     .landing-page {
-        min-height: 100vh;
-        overflow-y: auto;
+        min-height: 120vh;
+        overflow-y: scroll;
         padding: 1rem;
         display: block;
     }
