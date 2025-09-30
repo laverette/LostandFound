@@ -1391,6 +1391,32 @@ body::before {
         justify-content: center;
         align-items: center;
     }
+    
+    /* Responsive Design for Claim Page */
+    .claim-item-container {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .claim-status {
+        align-items: flex-start;
+        margin-top: 1rem;
+    }
+    
+    .btn-danger {
+        min-width: 150px;
+        padding: 0.875rem 1.5rem;
+        font-size: 0.9rem;
+    }
+    
+    .delete-confirmation-content {
+        margin: 1rem;
+        max-width: calc(100% - 2rem);
+    }
 }
 
 @media (max-width: 480px) {
@@ -2037,33 +2063,5 @@ body::before {
 .delete-warning li {
     margin: 0.5rem 0;
     font-weight: 500;
-}
-
-/* Responsive Design for Claim Page */
-@media (max-width: 768px) {
-    .claim-item-container {
-        grid-template-columns: 1fr;
-        gap: 1.5rem;
-    }
-    
-    .form-actions {
-        flex-direction: column;
-    }
-    
-    .claim-status {
-        align-items: flex-start;
-        margin-top: 1rem;
-    }
-    
-    .btn-danger {
-        min-width: 150px;
-        padding: 0.875rem 1.5rem;
-        font-size: 0.9rem;
-    }
-    
-    .delete-confirmation-content {
-        margin: 1rem;
-        max-width: calc(100% - 2rem);
-    }
 }
 
