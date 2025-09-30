@@ -1169,39 +1169,48 @@ body::before {
     .landing-page {
         height: 100vh;
         overflow: hidden;
-        padding: 0.5rem;
+        padding: 0.25rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
     
     .landing-container {
-        max-width: 95%;
-        padding: 1rem;
-        margin: 0.5rem auto;
+        max-width: 98%;
+        width: 98%;
+        padding: 0.75rem;
+        margin: 0;
         transform: none;
         max-height: 95vh;
         overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
     }
     
     .landing-logo {
-        width: 60px;
-        height: 60px;
-        margin-bottom: 0.5rem;
-    }
-    
-    .landing-header h1 {
-        font-size: 1.5rem;
+        width: 50px;
+        height: 50px;
         margin-bottom: 0.25rem;
     }
     
+    .landing-header h1 {
+        font-size: 1.3rem;
+        margin-bottom: 0.1rem;
+        line-height: 1.2;
+    }
+    
     .landing-subtitle {
-        font-size: 0.8rem;
-        margin-bottom: 0.75rem;
+        font-size: 0.75rem;
+        margin-bottom: 0.5rem;
+        line-height: 1.3;
     }
     
     .quick-stats {
         flex-direction: row;
-        gap: 0.5rem;
-        margin-bottom: 0.75rem;
-        padding: 0.5rem;
+        gap: 0.25rem;
+        margin-bottom: 0.5rem;
+        padding: 0.25rem;
     }
     
     .stat-item {
@@ -1209,20 +1218,76 @@ body::before {
     }
     
     .stat-number {
-        font-size: 1.2rem;
+        font-size: 1rem;
     }
     
     .stat-label {
-        font-size: 0.7rem;
+        font-size: 0.6rem;
+        line-height: 1.2;
     }
     
     .auth-buttons {
-        gap: 0.5rem;
+        gap: 0.4rem;
+        margin-top: 0.5rem;
     }
     
     .auth-btn {
-        padding: 0.875rem 1rem;
+        padding: 0.6rem 0.8rem;
+        font-size: 0.8rem;
+        min-height: auto;
+    }
+}
+
+/* Extra small mobile devices */
+@media (max-width: 480px) {
+    .landing-page {
+        padding: 0.1rem;
+    }
+    
+    .landing-container {
+        max-width: 99%;
+        width: 99%;
+        padding: 0.5rem;
+        max-height: 98vh;
+    }
+    
+    .landing-logo {
+        width: 40px;
+        height: 40px;
+        margin-bottom: 0.1rem;
+    }
+    
+    .landing-header h1 {
+        font-size: 1.1rem;
+        margin-bottom: 0.05rem;
+    }
+    
+    .landing-subtitle {
+        font-size: 0.7rem;
+        margin-bottom: 0.3rem;
+    }
+    
+    .quick-stats {
+        margin-bottom: 0.3rem;
+        padding: 0.1rem;
+    }
+    
+    .stat-number {
         font-size: 0.9rem;
+    }
+    
+    .stat-label {
+        font-size: 0.55rem;
+    }
+    
+    .auth-buttons {
+        gap: 0.3rem;
+        margin-top: 0.3rem;
+    }
+    
+    .auth-btn {
+        padding: 0.5rem 0.6rem;
+        font-size: 0.75rem;
     }
     
     .header .container {
