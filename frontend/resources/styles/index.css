@@ -1355,28 +1355,30 @@ body::before {
     .nav-btn {
         flex: 1;
         min-width: 0;
-        padding: 0.6rem 0.5rem;
-        font-size: 0.8rem;
+        padding: 0.6rem 0.4rem;
+        font-size: 0.75rem;
         text-align: center;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        line-height: 1.2;
     }
     
     .nav-btn i {
-        margin-right: 0.3rem;
-        font-size: 0.8rem;
+        margin-right: 0.25rem;
+        font-size: 0.75rem;
     }
     
     .logout-btn {
         flex: 1;
         min-width: 0;
-        padding: 0.6rem 0.5rem;
-        font-size: 0.8rem;
+        padding: 0.6rem 0.4rem;
+        font-size: 0.75rem;
         text-align: center;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        line-height: 1.2;
     }
 }
 
